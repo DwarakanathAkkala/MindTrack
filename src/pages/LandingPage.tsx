@@ -1,4 +1,5 @@
 import { Zap } from 'lucide-react';
+import { signInWithGoogle } from '../features/auth/services';
 
 export function LandingPage() {
     return (
@@ -21,7 +22,7 @@ export function LandingPage() {
                 </div>
 
                 <div className="space-y-4">
-                    <button className="btn-primary">
+                    <button className="btn-primary" onClick={signInWithGoogle}>
                         Sign In with Google
                     </button>
                     <button className="btn-secondary">
