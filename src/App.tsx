@@ -1,7 +1,12 @@
-import { LandingPage } from './pages/LandingPage';
+import { AppRouter } from './router/AppRouter';
+import { AuthListener } from './features/auth/components/AuthListener';
 
 function App() {
-  return <LandingPage />;
+  return (
+    <AuthListener>
+      <AppRouter />
+    </AuthListener>
+  );
 }
 
 export default App;

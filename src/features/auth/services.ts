@@ -1,4 +1,4 @@
-import { GoogleAuthProvider, signInWithPopup } from 'firebase/auth';
+import { GoogleAuthProvider, signInWithPopup, signOut } from 'firebase/auth';
 import type { User } from 'firebase/auth';
 import { auth } from '../../lib/firebase'; // We import our initialized auth service
 
@@ -19,5 +19,14 @@ export const signInWithGoogle = async (): Promise<User | null> => {
     } catch (error) {
         console.error("❌ Error during Google sign-in:", error);
         return null;
+    }
+};
+
+export const signOutUser = async () => {
+    try {
+        await signOut(auth);
+        console.log("✅ User signed out successfully");
+    } catch (error) {
+        console.error("❌ Error during sign out:", error);
     }
 };
