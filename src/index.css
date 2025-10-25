@@ -34,6 +34,11 @@ body {
   @apply w-full bg-gray-200 hover:bg-gray-300 text-black font-bold py-3 px-4 rounded-lg text-lg transition-colors;
 }
 
+.btn-primary-header {
+  /* On mobile, it's smaller. On larger screens, it uses the standard btn-primary padding. */
+  @apply flex items-center bg-indigo-600 hover:bg-indigo-700 text-white font-bold py-2 px-3 sm:py-3 sm:px-4 rounded-lg text-sm sm:text-base transition-all;
+}
+
 /* Onboarding Styles (Corrected) */
 .onboarding-container {
   /* Uses Tailwind's built-in color utilities */
@@ -124,4 +129,105 @@ body {
     opacity: 1;
     transform: translateY(0);
   }
+}
+
+/* Dashboard & Habit Styles */
+
+.dashboard-grid {
+  /* A responsive grid for the main dashboard layout */
+  @apply grid grid-cols-1 lg:grid-cols-3 gap-6 p-4 sm:p-6;
+}
+
+.dashboard-main-content {
+  /* The area for habits and other primary items */
+  @apply lg:col-span-2;
+}
+
+.dashboard-sidebar {
+  /* The area for the calendar and summary */
+  @apply lg:col-span-1;
+}
+
+.widget-card {
+  /* A generic card for dashboard widgets like calendar, summary, etc. */
+  @apply bg-white rounded-2xl shadow-lg border p-6;
+}
+
+.widget-title {
+  @apply text-xl font-bold text-gray-800 mb-4;
+}
+
+/* Habit Item Styles */
+.habit-item {
+  @apply flex items-center bg-white rounded-2xl shadow-md border p-4 transition-all duration-200 hover:shadow-lg;
+}
+
+.habit-icon-container {
+  @apply flex-shrink-0 w-12 h-12 rounded-full flex items-center justify-center;
+}
+
+.habit-title {
+  @apply font-semibold text-lg text-gray-800;
+}
+
+.habit-goal {
+  @apply text-sm text-gray-500;
+}
+
+.habit-checkbox {
+  @apply w-8 h-8 rounded-full border-2 flex-shrink-0 cursor-pointer transition-all duration-200;
+}
+
+
+/* Habit Interaction Styles */
+
+.habit-item-completed {
+  /* A subtle style to show the whole item is done */
+  @apply opacity-60 bg-gray-50;
+}
+
+.habit-title-completed {
+  /* Add a line-through to the title */
+  @apply line-through text-gray-500;
+}
+
+/* "More Options" Dropdown Menu */
+.options-menu-button {
+  @apply p-1 rounded-full text-gray-400 hover:bg-gray-100 hover:text-gray-700 transition-colors;
+}
+
+.options-menu {
+  @apply absolute top-8 right-0 bg-white rounded-lg shadow-xl border w-32 z-20;
+}
+
+.options-menu-item {
+  @apply flex items-center w-full text-left px-4 py-2 text-sm text-gray-700 hover:bg-gray-100;
+}
+
+/* Preset Color Classes */
+/* We will use these for both the icon background and the checkbox border/fill */
+.color-blue { @apply bg-blue-500 border-blue-500; }
+.color-green { @apply bg-green-500 border-green-500; }
+.color-red { @apply bg-red-500 border-red-500; }
+.color-yellow { @apply bg-yellow-500 border-yellow-500; }
+.color-purple { @apply bg-purple-500 border-purple-500; }
+.color-pink { @apply bg-pink-500 border-pink-500; }
+.color-teal { @apply bg-teal-500 border-teal-500; }
+
+/* Calendar Styles for Streaks */
+.calendar-grid {
+  @apply grid grid-cols-7 gap-2 text-center;
+}
+
+.calendar-day {
+  @apply w-9 h-9 flex items-center justify-center rounded-full;
+}
+
+.calendar-day-header {
+  @apply text-xs font-bold text-gray-500;
+}
+
+.calendar-streak-bar {
+  /* This will be the visual bar showing a completed day */
+  @apply bg-green-400 rounded-full h-1.5 w-4/5 mx-auto mt-1;
 }

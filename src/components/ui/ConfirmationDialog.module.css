@@ -1,0 +1,72 @@
+.dialogBackdrop {
+  position: fixed;
+  inset: 0;
+  z-index: 200; /* Must be higher than other modals */
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 1rem;
+  background-color: rgba(17, 24, 39, 0.5);
+  backdrop-filter: blur(4px);
+  -webkit-backdrop-filter: blur(4px);
+}
+
+.dialogCard {
+  max-width: 400px;
+  width: 100%;
+  background-color: white;
+  border-radius: 1rem; /* rounded-2xl */
+  box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.25);
+  border: 1px solid #E5E7EB; /* border */
+  padding: 1.5rem; /* p-6 */
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+}
+
+.iconContainer {
+  width: 3rem; /* w-12 */
+  height: 3rem; /* h-12 */
+  border-radius: 9999px; /* rounded-full */
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background-color: #FEF2F2; /* bg-red-50 */
+  margin-bottom: 1rem;
+}
+
+.dialogTitle {
+  font-size: 1.125rem; /* text-lg */
+  font-weight: 600; /* font-semibold */
+  color: #1F2937; /* text-gray-800 */
+}
+
+.dialogMessage {
+  margin-top: 0.5rem; /* mt-2 */
+  font-size: 0.875rem; /* text-sm */
+  color: #6B7280; /* text-gray-500 */
+}
+
+.buttonGroup {
+  margin-top: 1.5rem; /* mt-6 */
+  display: flex;
+  width: 100%;
+  gap: 0.75rem; /* space-x-3 */
+}
+
+.confirmButton {
+  width: 100%;
+  background-color: #EF4444; /* bg-red-500 */
+  color: white;
+  font-weight: 700;
+  padding-top: 0.75rem;
+  padding-bottom: 0.75rem;
+  padding-left: 1rem;
+  padding-right: 1rem;
+  border-radius: 0.5rem; /* rounded-lg */
+  transition-property: background-color;
+  transition-duration: 200ms;
+}
+.confirmButton:hover {
+  background-color: #DC2626; /* hover:bg-red-600 */
+}

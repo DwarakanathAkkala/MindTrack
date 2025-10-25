@@ -1,0 +1,88 @@
+/*
+ * Corrected CSS Module for AddHabitModal
+ * Contains robust centering and all self-contained styles.
+ */
+
+.modalBackdrop {
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  z-index: 100; /* High z-index to ensure it's on top */
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 1rem;
+  background-color: rgba(17, 24, 39, 0.3); /* gray-900 with 30% opacity */
+  backdrop-filter: blur(4px);
+  -webkit-backdrop-filter: blur(4px); /* For Safari browser support */
+}
+
+.formErrorText {
+  color: #EF4444; /* red-500 */
+  font-size: 0.875rem; /* text-sm */
+  margin-top: 0.25rem;
+}
+
+.formSectionTitle {
+  font-size: 0.875rem; /* text-sm */
+  font-weight: 700;
+  color: #6B7280; /* gray-500 */
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+  margin-top: 1.5rem;
+  margin-bottom: 0.5rem;
+}
+
+.colorPickerGrid {
+  display: grid;
+  grid-template-columns: repeat(7, minmax(0, 1fr));
+  gap: 0.5rem;
+}
+
+.colorSwatch {
+  width: 2.5rem;
+  height: 2.5rem;
+  border-radius: 9999px;
+  cursor: pointer;
+  transition-property: transform;
+  transition-duration: 200ms;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+.colorSwatch:hover {
+  transform: scale(1.1);
+}
+
+.colorSwatchSelected {
+  box-shadow: 0 0 0 2px #fff, 0 0 0 4px #4F46E5; /* ring-2 ring-offset-2 ring-indigo-600 */
+}
+
+.iconPickerGrid {
+  display: grid;
+  grid-template-columns: repeat(7, minmax(0, 1fr));
+  gap: 0.5rem;
+}
+
+.iconSwatch {
+  width: 2.5rem;
+  height: 2.5rem;
+  border-radius: 0.5rem;
+  cursor: pointer;
+  transition-property: all;
+  background-color: #F3F4F6; /* gray-100 */
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  color: #4B5563; /* gray-600 */
+}
+.iconSwatch:hover {
+  background-color: #E5E7EB; /* gray-200 */
+}
+
+.iconSwatchSelected {
+  background-color: #4F46E5; /* indigo-600 */
+  color: white;
+}
