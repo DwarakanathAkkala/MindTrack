@@ -1,11 +1,13 @@
 import { configureStore } from '@reduxjs/toolkit';
 import authReducer from '../features/auth/authSlice';
 import userReducer from '../features/user/userSlice';
+import habitsReducer from '../features/habits/habitsSlice';
 
 export const store = configureStore({
     reducer: {
         auth: authReducer,
         user: userReducer,
+        habits: habitsReducer
     },
     // This helps avoid errors with non-serializable data from Firebase
     middleware: (getDefaultMiddleware) =>

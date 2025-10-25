@@ -1,5 +1,6 @@
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import { useSelector } from 'react-redux';
+import { FiZap, FiBookOpen, FiCoffee, FiDroplet, FiMoon, FiSun } from 'react-icons/fi';
 import { FiPlus, FiCheck, FiLogOut } from 'react-icons/fi';
 import type { RootState } from '../store/store';
 import { AddHabitModal } from '../features/habits/components/AddHabitModal';
@@ -7,6 +8,8 @@ import { useDispatch } from 'react-redux';
 import { signOutUser } from '../features/auth/services';
 import { clearUser } from '../features/auth/authSlice';
 import type { AppDispatch } from '../store/store';
+import { getHabits } from '../features/habits/services';
+import { setHabits, setHabitsStatus } from '../features/habits/habitsSlice';
 
 // Placeholder data for today's habits
 const mockHabits = [
@@ -17,8 +20,24 @@ const mockHabits = [
 
 export function DashboardPage() {
     const user = useSelector((state: RootState) => state.auth.user);
+    const habits = useSelector((state: RootState) => state.habits.habits);
+    const habitsStatus = useSelector((state: RootState) => state.habits.status);
+
+
     const [isModalOpen, setIsModalOpen] = useState(false);
     const dispatch = useDispatch<AppDispatch>();
+
+    useEffect(() => {
+        if (user) {
+            dispatch(setHabitsStatus('loading'));
+            const unsubscribe = getHabits(user.uid, (habits) => {
+                dispatch(setHabits(habits));
+            });
+
+            // Return a cleanup function to unsubscribe when the component unmounts
+            return () => unsubscribe();
+        }
+    }, [user, dispatch]);
 
     const handleSignOut = async () => {
         await signOutUser();
@@ -53,8 +72,11 @@ export function DashboardPage() {
                     <div className="widget-card">
                         <h2 className="widget-title">Today's Habits</h2>
                         <div className="space-y-4">
-                            {/* We will map over real habit data here later */}
-                            {mockHabits.map(habit => (
+                            {habitsStatus === 'loading' && <p>Loading habits...</p>}
+                            {habitsStatus === 'succeeded' && habits.length === 0 && (
+                                <p className="text-gray-500">You haven't created any habits yet. Click "New Habit" to get started!</p>
+                            )}
+                            {habitsStatus === 'succeeded' && habits.map(habit => (
                                 <HabitItem key={habit.id} habit={habit} />
                             ))}
                         </div>
@@ -74,13 +96,16 @@ export function DashboardPage() {
     );
 }
 
+const iconMap = { FiZap, FiBookOpen, FiCoffee, FiDroplet, FiMoon, FiSun };
+
 // A new component for displaying a single habit
 function HabitItem({ habit }: { habit: any }) {
+    const IconComponent = iconMap[habit.icon as keyof typeof iconMap];
+
     return (
         <div className="habit-item">
             <div className={`habit-icon-container color-${habit.color}`}>
-                {/* In a real app, we'd have a component to render the correct icon by name */}
-                <p className="text-white text-2xl">💪</p>
+                {IconComponent && <IconComponent className="text-white" size={24} />}
             </div>
             <div className="ml-4 flex-grow">
                 <p className="habit-title">{habit.title}</p>
