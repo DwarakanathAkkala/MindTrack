@@ -34,7 +34,7 @@ export function AppRouter() {
             <Routes>
                 <Route
                     path="/"
-                    element={!user ? <LandingPage /> : <Navigate to="/dashboard" />}
+                    element={!user ? <LandingPage /> : <Navigate to={destination} />}
                 />
                 <Route
                     path="/dashboard"
