@@ -162,7 +162,13 @@ function HabitItem({ habit, isCompleted, onToggleComplete, onEdit, onDelete }: {
                 </button>
                 {isMenuOpen && (
                     <div className="options-menu fade-in-up">
-                        <button onClick={onEdit} className="options-menu-item">
+                        <button
+                            onClick={() => {
+                                onEdit(); // Call the function passed from the parent
+                                setIsMenuOpen(false); // Also close the menu
+                            }}
+                            className="options-menu-item"
+                        >
                             <FiEdit size={16} className="mr-2" />
                             Edit
                         </button>
