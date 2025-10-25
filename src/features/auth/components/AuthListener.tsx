@@ -3,6 +3,8 @@ import { onAuthStateChanged } from 'firebase/auth';
 import { auth } from '../../../lib/firebase';
 import { useDispatch } from 'react-redux';
 import { setUser } from '../authSlice';
+import { setUserProfile, setUserProfileStatus } from '../../user/userSlice';
+import { getUserProfile } from '../../user/services';
 import type { AppDispatch } from '../../../store/store';
 
 // This component will have no UI, it only runs logic.
@@ -11,16 +13,20 @@ export function AuthListener({ children }: { children: React.ReactNode }) {
     const dispatch = useDispatch<AppDispatch>();
 
     useEffect(() => {
-        // onAuthStateChanged is a Firebase function that listens for login/logout events.
-        // It also runs ONCE when the app first loads.
-        const unsubscribe = onAuthStateChanged(auth, (user) => {
-            // If a user object exists, they are logged in.
-            // If it's null, they are logged out.
-            // This will be dispatched on initial load, changing the status from 'loading' to 'succeeded'.
-            dispatch(setUser(user));
+        const unsubscribe = onAuthStateChanged(auth, async (user) => {
+            if (user) {
+                // User is logged in
+                dispatch(setUser(user));
+                dispatch(setUserProfileStatus('loading'));
+                const profile = await getUserProfile(user.uid);
+                dispatch(setUserProfile(profile)); // This will be null for new users
+            } else {
+                // User is logged out
+                dispatch(setUser(null));
+                dispatch(setUserProfile(null));
+            }
         });
 
-        // The cleanup function will run when the component unmounts
         return () => unsubscribe();
     }, [dispatch]); // The effect depends on the dispatch function
 
