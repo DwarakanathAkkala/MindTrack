@@ -2,7 +2,7 @@ import { useState } from 'react';
 import { useSelector } from 'react-redux';
 import type { RootState } from '../store/store';
 import { saveUserProfile } from '../features/user/services';
-import { FiUser, FiZap, FiMoon, FiSun, FiBarChart2, FiTrendingUp, FiCheckCircle } from 'react-icons/fi';
+import { FiZap, FiMoon, FiSun, FiBarChart2, FiCheckCircle } from 'react-icons/fi';
 import { useNavigate } from 'react-router-dom';
 
 const TOTAL_STEPS = 2;
