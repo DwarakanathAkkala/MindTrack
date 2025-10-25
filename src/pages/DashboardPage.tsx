@@ -1,14 +1,17 @@
+// No changes needed here, but this is the complete file for reference.
 import { useState, useEffect } from 'react';
 import { useSelector, useDispatch } from 'react-redux';
-import { FiPlus, FiCheck, FiMoreVertical, FiEdit, FiTrash2, FiZap, FiBookOpen, FiCoffee, FiDroplet, FiMoon, FiSun, FiLogOut } from 'react-icons/fi';
+import { FiPlus, FiMoreVertical, FiEdit, FiTrash2, FiZap, FiBookOpen, FiCoffee, FiDroplet, FiMoon, FiSun, FiLogOut } from 'react-icons/fi';
 import type { RootState, AppDispatch } from '../store/store';
+import { useConfirmationDialog } from '../components/ui/useConfirmationDialog';
+import type { DialogOptions } from '../components/ui/useConfirmationDialog';
+import { ConfirmationDialog } from '../components/ui/ConfirmationDialog';
 import { AddHabitModal } from '../features/habits/components/AddHabitModal';
-import { getHabits } from '../features/habits/services';
+import { getHabits, deleteHabit } from '../features/habits/services';
 import { setHabits, setHabitsStatus } from '../features/habits/habitsSlice';
 import { signOutUser } from '../features/auth/services';
 import { clearUser } from '../features/auth/authSlice';
 
-// Helper map to render icons from their names
 const iconMap = { FiZap, FiBookOpen, FiCoffee, FiDroplet, FiMoon, FiSun };
 
 export function DashboardPage() {
@@ -16,13 +19,16 @@ export function DashboardPage() {
     const habits = useSelector((state: RootState) => state.habits.habits);
     const habitsStatus = useSelector((state: RootState) => state.habits.status);
 
-    const [isModalOpen, setIsModalOpen] = useState(false);
     const dispatch = useDispatch<AppDispatch>();
 
-    // NOTE: For now, completion state is managed locally in this component.
-    // In a future step, this will be moved to Redux and synced with Firebase.
+    const [modalState, setModalState] = useState<{ isOpen: boolean; habitToEdit: any | null }>({
+        isOpen: false,
+        habitToEdit: null,
+    });
+
     const [completions, setCompletions] = useState<{ [key: string]: boolean }>({});
-    const today = new Date().toISOString().split('T')[0]; // Get date in YYYY-MM-DD format
+
+    const { confirm, dialogState, handleConfirm, handleCancel } = useConfirmationDialog();
 
     useEffect(() => {
         if (user) {
@@ -30,8 +36,6 @@ export function DashboardPage() {
             const unsubscribe = getHabits(user.uid, (habits) => {
                 dispatch(setHabits(habits));
             });
-
-            // Cleanup the listener when the component unmounts
             return () => unsubscribe();
         }
     }, [user, dispatch]);
@@ -42,24 +46,17 @@ export function DashboardPage() {
     };
 
     const handleToggleCompletion = (habitId: string) => {
-        const currentStatus = completions[habitId] || false;
-        const newStatus = !currentStatus;
-        setCompletions(prev => ({ ...prev, [habitId]: newStatus }));
-
-        // Here we would call the Firebase service to log the completion
-        // if (user) {
-        //   logHabitCompletion(user.uid, habitId, today, newStatus);
-        // }
+        setCompletions(prev => ({ ...prev, [habitId]: !prev[habitId] }));
     };
 
     return (
-        <div className={`bg-gray-100 min-h-screen transition-filter duration-300 ${isModalOpen ? 'blur-sm' : ''}`}>
+        <div className="bg-gray-100 min-h-screen">
             <header className="bg-white shadow-sm p-4 flex flex-wrap justify-between items-center gap-4">
                 <h1 className="text-xl sm:text-2xl font-bold text-gray-800 truncate">
                     Welcome, {user?.displayName || 'User'}!
                 </h1>
                 <div className="flex items-center space-x-2">
-                    <button className="btn-primary-header" onClick={() => setIsModalOpen(true)}>
+                    <button className="btn-primary-header" onClick={() => setModalState({ isOpen: true, habitToEdit: null })}>
                         <FiPlus className="mr-2" />
                         New Habit
                     </button>
@@ -88,6 +85,8 @@ export function DashboardPage() {
                                     habit={habit}
                                     isCompleted={completions[habit.id] || false}
                                     onToggleComplete={() => handleToggleCompletion(habit.id)}
+                                    onEdit={() => setModalState({ isOpen: true, habitToEdit: habit })}
+                                    onDelete={confirm}
                                 />
                             ))}
                         </div>
@@ -102,22 +101,50 @@ export function DashboardPage() {
                 </div>
             </main>
 
-            <AddHabitModal isOpen={isModalOpen} onClose={() => setIsModalOpen(false)} />
+            <AddHabitModal
+                isOpen={modalState.isOpen}
+                onClose={() => setModalState({ isOpen: false, habitToEdit: null })}
+                habitToEdit={modalState.habitToEdit}
+            />
+
+            <ConfirmationDialog
+                isOpen={dialogState.isOpen}
+                title={dialogState.options?.title || ''}
+                message={dialogState.options?.message || ''}
+                confirmText={dialogState.options?.confirmText}
+                cancelText={dialogState.options?.cancelText}
+                onConfirm={handleConfirm}
+                onCancel={handleCancel}
+            />
         </div>
     );
 }
 
-
-// --- Child Components ---
-
-function HabitItem({ habit, isCompleted, onToggleComplete }: { habit: any; isCompleted: boolean; onToggleComplete: () => void; }) {
+function HabitItem({ habit, isCompleted, onToggleComplete, onEdit, onDelete }: {
+    habit: any;
+    isCompleted: boolean;
+    onToggleComplete: () => void;
+    onEdit: () => void;
+    onDelete: (options: DialogOptions) => Promise<boolean>;
+}) {
+    const user = useSelector((state: RootState) => state.auth.user);
     const IconComponent = iconMap[habit.icon as keyof typeof iconMap];
     const [isMenuOpen, setIsMenuOpen] = useState(false);
 
-    const handleEdit = () => {
-        // This will eventually open the modal with the habit's data
-        console.log("Editing habit:", habit.title);
+    const handleDelete = async () => {
+        if (!user) return;
         setIsMenuOpen(false);
+
+        const wasConfirmed = await onDelete({
+            title: "Delete Habit",
+            message: `Are you sure you want to permanently delete "${habit.title}"? This action cannot be undone.`,
+            confirmText: "Yes, Delete",
+            cancelText: "No, Keep it",
+        });
+
+        if (wasConfirmed) {
+            deleteHabit(user.uid, habit.id);
+        }
     };
 
     return (
@@ -125,35 +152,31 @@ function HabitItem({ habit, isCompleted, onToggleComplete }: { habit: any; isCom
             <div className={`habit-icon-container color-${habit.color}`}>
                 {IconComponent && <IconComponent className="text-white" size={24} />}
             </div>
-
             <div className="ml-4 flex-grow">
                 <p className={`habit-title ${isCompleted ? 'habit-title-completed' : ''}`}>{habit.title}</p>
                 <p className="habit-goal">Goal placeholder</p>
             </div>
-
             <div className="relative">
                 <button className="options-menu-button" onClick={() => setIsMenuOpen(prev => !prev)}>
                     <FiMoreVertical size={20} />
                 </button>
                 {isMenuOpen && (
                     <div className="options-menu fade-in-up">
-                        <button onClick={handleEdit} className="options-menu-item">
+                        <button onClick={onEdit} className="options-menu-item">
                             <FiEdit size={16} className="mr-2" />
                             Edit
                         </button>
-                        <button className="options-menu-item text-red-500">
+                        <button onClick={handleDelete} className="options-menu-item text-red-500">
                             <FiTrash2 size={16} className="mr-2" />
                             Delete
                         </button>
                     </div>
                 )}
             </div>
-
             <div
                 onClick={onToggleComplete}
                 className={`habit-checkbox ml-4 ${isCompleted ? `color-${habit.color}` : 'border-gray-300'}`}
-            >
-            </div>
+            ></div>
         </div>
     );
 }

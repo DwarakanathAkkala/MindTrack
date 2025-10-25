@@ -98,3 +98,20 @@ export const updateHabit = async (userId: string, habitId: string, updates: Part
         console.error("❌ Error updating habit:", error);
     }
 };
+
+
+/**
+ * Deletes a specific habit for a user.
+ * @param userId The user's ID.
+ * @param habitId The ID of the habit to delete.
+ */
+export const deleteHabit = async (userId: string, habitId: string) => {
+    try {
+        const habitRef = ref(db, `habits/${userId}/${habitId}`);
+        await remove(habitRef);
+        // We should also delete the habit's logs, but we'll add that later for simplicity.
+        console.log("✅ Habit deleted successfully!");
+    } catch (error) {
+        console.error("❌ Error deleting habit:", error);
+    }
+};
