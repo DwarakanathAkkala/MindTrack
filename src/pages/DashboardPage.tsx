@@ -1,31 +1,28 @@
 import { useState, useEffect } from 'react';
-import { useSelector } from 'react-redux';
-import { FiZap, FiBookOpen, FiCoffee, FiDroplet, FiMoon, FiSun } from 'react-icons/fi';
-import { FiPlus, FiCheck, FiLogOut } from 'react-icons/fi';
-import type { RootState } from '../store/store';
+import { useSelector, useDispatch } from 'react-redux';
+import { FiPlus, FiCheck, FiMoreVertical, FiEdit, FiTrash2, FiZap, FiBookOpen, FiCoffee, FiDroplet, FiMoon, FiSun, FiLogOut } from 'react-icons/fi';
+import type { RootState, AppDispatch } from '../store/store';
 import { AddHabitModal } from '../features/habits/components/AddHabitModal';
-import { useDispatch } from 'react-redux';
-import { signOutUser } from '../features/auth/services';
-import { clearUser } from '../features/auth/authSlice';
-import type { AppDispatch } from '../store/store';
 import { getHabits } from '../features/habits/services';
 import { setHabits, setHabitsStatus } from '../features/habits/habitsSlice';
+import { signOutUser } from '../features/auth/services';
+import { clearUser } from '../features/auth/authSlice';
 
-// Placeholder data for today's habits
-const mockHabits = [
-    { id: '1', title: 'Morning Workout', icon: 'FiZap', color: 'blue', goal: '30 minutes', completed: false },
-    { id: '2', title: 'Drink Water', icon: 'FiDroplet', color: 'teal', goal: '8 glasses', completed: true },
-    { id: '3', title: 'Read a Book', icon: 'FiBookOpen', color: 'purple', goal: '1 chapter', completed: false },
-];
+// Helper map to render icons from their names
+const iconMap = { FiZap, FiBookOpen, FiCoffee, FiDroplet, FiMoon, FiSun };
 
 export function DashboardPage() {
     const user = useSelector((state: RootState) => state.auth.user);
     const habits = useSelector((state: RootState) => state.habits.habits);
     const habitsStatus = useSelector((state: RootState) => state.habits.status);
 
-
     const [isModalOpen, setIsModalOpen] = useState(false);
     const dispatch = useDispatch<AppDispatch>();
+
+    // NOTE: For now, completion state is managed locally in this component.
+    // In a future step, this will be moved to Redux and synced with Firebase.
+    const [completions, setCompletions] = useState<{ [key: string]: boolean }>({});
+    const today = new Date().toISOString().split('T')[0]; // Get date in YYYY-MM-DD format
 
     useEffect(() => {
         if (user) {
@@ -34,7 +31,7 @@ export function DashboardPage() {
                 dispatch(setHabits(habits));
             });
 
-            // Return a cleanup function to unsubscribe when the component unmounts
+            // Cleanup the listener when the component unmounts
             return () => unsubscribe();
         }
     }, [user, dispatch]);
@@ -44,9 +41,19 @@ export function DashboardPage() {
         dispatch(clearUser());
     };
 
+    const handleToggleCompletion = (habitId: string) => {
+        const currentStatus = completions[habitId] || false;
+        const newStatus = !currentStatus;
+        setCompletions(prev => ({ ...prev, [habitId]: newStatus }));
+
+        // Here we would call the Firebase service to log the completion
+        // if (user) {
+        //   logHabitCompletion(user.uid, habitId, today, newStatus);
+        // }
+    };
+
     return (
-        <div className="bg-gray-100 min-h-screen">
-            {/* Header */}
+        <div className={`bg-gray-100 min-h-screen transition-filter duration-300 ${isModalOpen ? 'blur-sm' : ''}`}>
             <header className="bg-white shadow-sm p-4 flex flex-wrap justify-between items-center gap-4">
                 <h1 className="text-xl sm:text-2xl font-bold text-gray-800 truncate">
                     Welcome, {user?.displayName || 'User'}!
@@ -66,7 +73,6 @@ export function DashboardPage() {
                 </div>
             </header>
 
-            {/* Main Content Grid */}
             <main className="dashboard-grid">
                 <div className="dashboard-main-content">
                     <div className="widget-card">
@@ -77,7 +83,12 @@ export function DashboardPage() {
                                 <p className="text-gray-500">You haven't created any habits yet. Click "New Habit" to get started!</p>
                             )}
                             {habitsStatus === 'succeeded' && habits.map(habit => (
-                                <HabitItem key={habit.id} habit={habit} />
+                                <HabitItem
+                                    key={habit.id}
+                                    habit={habit}
+                                    isCompleted={completions[habit.id] || false}
+                                    onToggleComplete={() => handleToggleCompletion(habit.id)}
+                                />
                             ))}
                         </div>
                     </div>
@@ -96,32 +107,60 @@ export function DashboardPage() {
     );
 }
 
-const iconMap = { FiZap, FiBookOpen, FiCoffee, FiDroplet, FiMoon, FiSun };
 
-// A new component for displaying a single habit
-function HabitItem({ habit }: { habit: any }) {
+// --- Child Components ---
+
+function HabitItem({ habit, isCompleted, onToggleComplete }: { habit: any; isCompleted: boolean; onToggleComplete: () => void; }) {
     const IconComponent = iconMap[habit.icon as keyof typeof iconMap];
+    const [isMenuOpen, setIsMenuOpen] = useState(false);
+
+    const handleEdit = () => {
+        // This will eventually open the modal with the habit's data
+        console.log("Editing habit:", habit.title);
+        setIsMenuOpen(false);
+    };
 
     return (
-        <div className="habit-item">
+        <div className={`habit-item ${isCompleted ? 'habit-item-completed' : ''}`}>
             <div className={`habit-icon-container color-${habit.color}`}>
                 {IconComponent && <IconComponent className="text-white" size={24} />}
             </div>
+
             <div className="ml-4 flex-grow">
-                <p className="habit-title">{habit.title}</p>
-                <p className="habit-goal">{habit.goal}</p>
+                <p className={`habit-title ${isCompleted ? 'habit-title-completed' : ''}`}>{habit.title}</p>
+                <p className="habit-goal">Goal placeholder</p>
             </div>
-            <div className={`habit-checkbox ${habit.completed ? `color-${habit.color}` : 'border-gray-300'}`}>
-                {habit.completed && <FiCheck className="text-white mx-auto my-auto" />}
+
+            <div className="relative">
+                <button className="options-menu-button" onClick={() => setIsMenuOpen(prev => !prev)}>
+                    <FiMoreVertical size={20} />
+                </button>
+                {isMenuOpen && (
+                    <div className="options-menu fade-in-up">
+                        <button onClick={handleEdit} className="options-menu-item">
+                            <FiEdit size={16} className="mr-2" />
+                            Edit
+                        </button>
+                        <button className="options-menu-item text-red-500">
+                            <FiTrash2 size={16} className="mr-2" />
+                            Delete
+                        </button>
+                    </div>
+                )}
+            </div>
+
+            <div
+                onClick={onToggleComplete}
+                className={`habit-checkbox ml-4 ${isCompleted ? `color-${habit.color}` : 'border-gray-300'}`}
+            >
             </div>
         </div>
     );
 }
 
-// A new component for the calendar
 function Calendar() {
     const days = ['S', 'M', 'T', 'W', 'T', 'F', 'S'];
-    const dates = Array.from({ length: 35 }, (_, i) => i - 2); // Dummy dates
+    const dates = Array.from({ length: 35 }, (_, i) => i - 2);
     return (
         <div>
             <div className="calendar-grid">

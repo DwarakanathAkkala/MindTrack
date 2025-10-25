@@ -179,6 +179,31 @@ body {
 }
 
 
+/* Habit Interaction Styles */
+
+.habit-item-completed {
+  /* A subtle style to show the whole item is done */
+  @apply opacity-60 bg-gray-50;
+}
+
+.habit-title-completed {
+  /* Add a line-through to the title */
+  @apply line-through text-gray-500;
+}
+
+/* "More Options" Dropdown Menu */
+.options-menu-button {
+  @apply p-1 rounded-full text-gray-400 hover:bg-gray-100 hover:text-gray-700 transition-colors;
+}
+
+.options-menu {
+  @apply absolute top-8 right-0 bg-white rounded-lg shadow-xl border w-32 z-20;
+}
+
+.options-menu-item {
+  @apply flex items-center w-full text-left px-4 py-2 text-sm text-gray-700 hover:bg-gray-100;
+}
+
 /* Preset Color Classes */
 /* We will use these for both the icon background and the checkbox border/fill */
 .color-blue { @apply bg-blue-500 border-blue-500; }

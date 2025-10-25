@@ -1,4 +1,4 @@
-import { ref, push, set, onValue } from 'firebase/database';
+import { ref, push, set, onValue, update, remove } from 'firebase/database';
 import { db } from '../../lib/firebase';
 
 // Define a type for the habit data for type safety
@@ -64,3 +64,37 @@ export const getHabits = (userId: string, callback: (habits: any[]) => void) => 
     // Return the unsubscribe function so we can stop listening later
     return unsubscribe;
 }
+
+
+/**
+ * Logs the completion status of a habit for a specific day.
+ * @param userId The user's ID.
+ * @param habitId The ID of the habit.
+ * @param date The date in YYYY-MM-DD format.
+ * @param completed The completion status.
+ */
+export const logHabitCompletion = async (userId: string, habitId: string, date: string, completed: boolean) => {
+    try {
+        const logRef = ref(db, `habitLogs/${userId}/${habitId}/${date}`);
+        await set(logRef, { completed });
+        console.log(`✅ Habit log updated for ${date}`);
+    } catch (error) {
+        console.error("❌ Error logging habit completion:", error);
+    }
+};
+
+/**
+ * Updates the data for an existing habit.
+ * @param userId The user's ID.
+ * @param habitId The ID of the habit to update.
+ * @param updates An object containing the fields to update.
+ */
+export const updateHabit = async (userId: string, habitId: string, updates: Partial<Habit>) => {
+    try {
+        const habitRef = ref(db, `habits/${userId}/${habitId}`);
+        await update(habitRef, updates);
+        console.log("✅ Habit updated successfully!");
+    } catch (error) {
+        console.error("❌ Error updating habit:", error);
+    }
+};
