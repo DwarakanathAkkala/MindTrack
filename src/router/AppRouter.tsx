@@ -14,13 +14,19 @@ export function AppRouter() {
     const user = useSelector((state: RootState) => state.auth.user);
     const authStatus = useSelector((state: RootState) => state.auth.status);
 
-    // Show a loading indicator while we check for a user
-    if (authStatus === 'loading') {
-        return (
-            <div className="flex items-center justify-center min-h-screen">
-                <p>Loading...</p>
-            </div>
-        );
+    // 1. Get the profile and its loading status
+    const userProfile = useSelector((state: RootState) => state.user.profile);
+    const profileStatus = useSelector((state: RootState) => state.user.status);
+
+    // 2. Update the loading condition
+    if (authStatus === 'loading' || profileStatus === 'loading') {
+        return <div className="flex items-center justify-center min-h-screen"><p>Loading...</p></div>;
+    }
+
+    // 3. Define the destination based on whether onboarding is complete
+    let destination = '/dashboard';
+    if (user && (!userProfile || !userProfile.onboardingCompleted)) {
+        destination = '/onboarding';
     }
 
     return (
@@ -28,7 +34,7 @@ export function AppRouter() {
             <Routes>
                 <Route
                     path="/"
-                    element={!user ? <LandingPage /> : <Navigate to="/dashboard" />}
+                    element={!user ? <LandingPage /> : <Navigate to={destination} />}
                 />
                 <Route
                     path="/dashboard"
