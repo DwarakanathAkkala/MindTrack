@@ -8,7 +8,7 @@ import { useSelector } from 'react-redux';
 import type { RootState } from '../store/store';
 import { LandingPage } from '../pages/LandingPage';
 import { DashboardPage } from '../pages/DashboardPage';
-
+import { OnboardingPage } from '../pages/OnboardingPage'
 export function AppRouter() {
     // Get the user from our Redux store
     const user = useSelector((state: RootState) => state.auth.user);
@@ -33,6 +33,10 @@ export function AppRouter() {
                 <Route
                     path="/dashboard"
                     element={user ? <DashboardPage /> : <Navigate to="/" />}
+                />
+                <Route
+                    path="/onboarding"
+                    element={user ? <OnboardingPage /> : <Navigate to="/" />}
                 />
             </Routes>
         </Router>
