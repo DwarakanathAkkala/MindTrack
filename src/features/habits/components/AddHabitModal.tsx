@@ -5,6 +5,7 @@ import type { RootState } from '../../../store/store';
 import { createHabit, updateHabit } from '../services';
 import type { Habit } from '../services';
 import styles from './AddHabitModal.module.css';
+import { useToast } from '../../../context/ToastContext'; // Import the new hook
 
 interface AddHabitModalProps {
     isOpen: boolean;
@@ -16,6 +17,7 @@ const colorOptions = ['blue', 'green', 'red', 'yellow', 'purple', 'pink', 'teal'
 const iconOptions = { FiZap, FiBookOpen, FiCoffee, FiDroplet, FiMoon, FiSun };
 
 export function AddHabitModal({ isOpen, onClose, habitToEdit }: AddHabitModalProps) {
+    const { showToast } = useToast();
     const user = useSelector((state: RootState) => state.auth.user);
 
     const getTodayString = () => new Date().toISOString().split('T')[0];
@@ -34,7 +36,6 @@ export function AddHabitModal({ isOpen, onClose, habitToEdit }: AddHabitModalPro
     const [startDate, setStartDate] = useState(getTodayString());
     const [endDate, setEndDate] = useState('');
     const [reminderTime, setReminderTime] = useState('');
-
     const isEditMode = habitToEdit !== null;
 
     useEffect(() => {
@@ -113,8 +114,10 @@ export function AddHabitModal({ isOpen, onClose, habitToEdit }: AddHabitModalPro
 
         if (isEditMode) {
             await updateHabit(user.uid, habitToEdit.id, habitData);
+            showToast('Habit updated successfully!');
         } else {
             await createHabit(user.uid, habitData as Habit);
+            showToast('Habit created successfully!');
         }
         handleClose();
     };
@@ -137,13 +140,7 @@ export function AddHabitModal({ isOpen, onClose, habitToEdit }: AddHabitModalPro
                         </div>
                         <div>
                             <label className="form-label">Category</label>
-                            <input
-                                type="text"
-                                className="form-input"
-                                placeholder="e.g., Health, Work, Fitness..."
-                                value={category}
-                                onChange={(e) => setCategory(e.target.value)}
-                            />
+                            <input type="text" className="form-input" placeholder="e.g., Health, Work, Fitness..." value={category} onChange={(e) => setCategory(e.target.value)} />
                         </div>
                         <div>
                             <label className={styles.formSectionTitle}>Color</label>
