@@ -1,70 +1,92 @@
 import { useState, useEffect } from 'react';
-import { FiX, FiZap, FiBookOpen, FiCoffee, FiDroplet, FiMoon, FiSun } from 'react-icons/fi';
+import { FiX, FiZap, FiBookOpen, FiCoffee, FiDroplet, FiMoon, FiSun, FiTrash2, FiPlusCircle } from 'react-icons/fi'; // Import FiPlusCircle
 import { useSelector } from 'react-redux';
 import type { RootState } from '../../../store/store';
-import { createHabit, updateHabit } from '../services'; // Import updateHabit and the Habit type
-import type { Habit } from '../services'; // Import updateHabit and the Habit type
+import { createHabit, updateHabit } from '../services';
+import type { Habit } from '../services';
 import styles from './AddHabitModal.module.css';
 
-// 1. DEFINE THE PROPS THE COMPONENT ACCEPTS
+// ... (interfaces and consts remain the same)
 interface AddHabitModalProps {
     isOpen: boolean;
     onClose: () => void;
-    habitToEdit: (Habit & { id: string }) | null; // <-- THIS IS THE FIX
+    habitToEdit: (Habit & { id: string }) | null;
 }
-
 const colorOptions = ['blue', 'green', 'red', 'yellow', 'purple', 'pink', 'teal'];
 const iconOptions = { FiZap, FiBookOpen, FiCoffee, FiDroplet, FiMoon, FiSun };
 
-export function AddHabitModal({ isOpen, onClose, habitToEdit }: AddHabitModalProps) { // 2. DESTRUCTURE THE PROP
+export function AddHabitModal({ isOpen, onClose, habitToEdit }: AddHabitModalProps) {
+    // All the state and handler functions remain exactly the same.
     const user = useSelector((state: RootState) => state.auth.user);
-
     const [title, setTitle] = useState('');
     const [titleError, setTitleError] = useState<string | null>(null);
     const [selectedColor, setSelectedColor] = useState(colorOptions[0]);
     const [selectedIcon, setSelectedIcon] = useState('FiZap');
-
+    const [goalType, setGoalType] = useState<'reps' | 'duration'>('reps');
+    const [goalTarget, setGoalTarget] = useState<number>(1);
+    const [goalUnit, setGoalUnit] = useState('times');
+    const [repeatFrequency, setRepeatFrequency] = useState<'daily' | 'weekly'>('daily');
+    const [subtasks, setSubtasks] = useState<{ [id: string]: { text: string; completed: boolean } }>({});
+    const [newSubtaskText, setNewSubtaskText] = useState('');
     const isEditMode = habitToEdit !== null;
-
-    // 3. USEEFFECT TO PRE-FILL THE FORM IN EDIT MODE
     useEffect(() => {
         if (isEditMode && isOpen) {
             setTitle(habitToEdit.title);
             setSelectedColor(habitToEdit.color);
             setSelectedIcon(habitToEdit.icon);
+            setGoalType(habitToEdit.goal?.type as 'reps' | 'duration' || 'reps');
+            setGoalTarget(habitToEdit.goal?.target || 1);
+            setGoalUnit(habitToEdit.goal?.unit || 'times');
+            setRepeatFrequency(habitToEdit.repeat?.frequency || 'daily');
+            setSubtasks(habitToEdit.subtasks || {});
         }
     }, [habitToEdit, isOpen, isEditMode]);
-
+    const handleAddSubtask = () => {
+        if (!newSubtaskText.trim()) return;
+        const newId = `subtask_${Date.now()}`;
+        setSubtasks(prev => ({ ...prev, [newId]: { text: newSubtaskText, completed: false } }));
+        setNewSubtaskText('');
+    };
+    const handleRemoveSubtask = (id: string) => {
+        setSubtasks(prev => {
+            const newSubtasks = { ...prev };
+            delete newSubtasks[id];
+            return newSubtasks;
+        });
+    };
     const handleClose = () => {
-        // Reset the form state before closing
         setTitle('');
         setTitleError(null);
         setSelectedColor(colorOptions[0]);
         setSelectedIcon('FiZap');
+        setGoalType('reps');
+        setGoalTarget(1);
+        setGoalUnit('times');
+        setRepeatFrequency('daily');
+        setSubtasks({});
+        setNewSubtaskText('');
         onClose();
     };
-
     const handleSave = async () => {
         if (!title.trim()) {
-            setTitleError('Please enter a title for your habit.');
+            setTitleError('Please enter a title.');
             return;
         }
         setTitleError(null);
         if (!user) return;
-
-        const habitData = {
+        const habitData: Habit = {
             title,
-            color: selectedColor,
             icon: selectedIcon,
+            color: selectedColor,
+            goal: { type: goalType, target: goalTarget, unit: goalUnit },
+            repeat: { frequency: repeatFrequency },
+            subtasks,
         };
-
-        // 4. USE UPDATE OR CREATE LOGIC
         if (isEditMode) {
             await updateHabit(user.uid, habitToEdit.id, habitData);
         } else {
             await createHabit(user.uid, habitData);
         }
-
         handleClose();
     };
 
@@ -72,68 +94,109 @@ export function AddHabitModal({ isOpen, onClose, habitToEdit }: AddHabitModalPro
 
     return (
         <div className={styles.modalBackdrop}>
-            <div className="widget-card w-full max-w-md fade-in-up">
-                <div className="flex justify-between items-center">
-                    <h2 className="widget-title">{isEditMode ? 'Edit Habit' : 'Create a New Habit'}</h2>
+            <div className="w-full max-w-md bg-white rounded-2xl shadow-xl overflow-hidden flex flex-col max-h-[90vh] fade-in-up">
+
+                {/* --- HEADER --- */}
+                <div className="flex-shrink-0 px-6 py-4 border-b flex justify-between items-center bg-gray-50">
+                    <h2 className="text-xl font-bold text-gray-800">{isEditMode ? 'Edit Habit' : 'Create a New Habit'}</h2>
                     <button onClick={handleClose} className="text-gray-500 hover:text-gray-800">
                         <FiX size={24} />
                     </button>
                 </div>
 
-                <div className="space-y-4">
-                    {/* Title Input */}
-                    <div>
-                        <label className="form-label">Title</label>
-                        <input
-                            type="text"
-                            className="form-input"
-                            value={title}
-                            onChange={(e) => {
-                                setTitle(e.target.value);
-                                if (titleError) setTitleError(null);
-                            }}
-                        />
-                        {titleError && <p className={styles.formErrorText}>{titleError}</p>}
+                {/* --- SCROLLABLE CONTENT --- */}
+                <div className="flex-grow overflow-y-auto p-6 space-y-6">
+
+                    {/* Title, Color, Icon */}
+                    <div className="space-y-4">
+                        <div>
+                            <label className="form-label">Title</label>
+                            <input type="text" className="form-input" value={title} onChange={(e) => { setTitle(e.target.value); if (titleError) setTitleError(null); }} />
+                            {titleError && <p className={styles.formErrorText}>{titleError}</p>}
+                        </div>
+                        <div>
+                            <label className={styles.formSectionTitle}>Color</label>
+                            <div className={styles.colorPickerGrid}>
+                                {colorOptions.map(color => (<div key={color} onClick={() => setSelectedColor(color)} className={`${styles.colorSwatch} ${selectedColor === color ? styles.colorSwatchSelected : ''}`}> <div className={`w-full h-full rounded-full color-${color}`}></div> </div>))}
+                            </div>
+                        </div>
+                        <div>
+                            <label className={styles.formSectionTitle}>Icon</label>
+                            <div className={styles.iconPickerGrid}>
+                                {Object.keys(iconOptions).map(iconName => { const Icon = iconOptions[iconName as keyof typeof iconOptions]; return (<div key={iconName} onClick={() => setSelectedIcon(iconName)} className={`${styles.iconSwatch} ${selectedIcon === iconName ? styles.iconSwatchSelected : ''}`}> <Icon size={22} /> </div>); })}
+                            </div>
+                        </div>
                     </div>
 
-                    {/* Color Picker */}
+                    {/* Goal */}
                     <div>
-                        <label className={styles.formSectionTitle}>Color</label>
-                        <div className={styles.colorPickerGrid}>
-                            {colorOptions.map(color => (
-                                <div
-                                    key={color}
-                                    onClick={() => setSelectedColor(color)}
-                                    className={`${styles.colorSwatch} ${selectedColor === color ? styles.colorSwatchSelected : ''}`}
-                                >
-                                    <div className={`w-full h-full rounded-full color-${color}`}></div>
+                        <label className={styles.formSectionTitle}>Goal</label>
+                        <div className={styles.segmentedControl}>
+                            <button onClick={() => { setGoalType('reps'); setGoalUnit('times'); }} className={`${styles.segmentedControlButton} ${goalType === 'reps' ? styles.segmentedControlButtonSelected : ''}`}>Reps</button>
+                            <button onClick={() => { setGoalType('duration'); setGoalUnit('minutes'); }} className={`${styles.segmentedControlButton} ${goalType === 'duration' ? styles.segmentedControlButtonSelected : ''}`}>Duration</button>
+                        </div>
+                        <div className="flex mt-3">
+                            <input type="number" min="1" className="form-input rounded-r-none border-r-0 focus:z-10 relative" value={goalTarget} onChange={(e) => setGoalTarget(Number(e.target.value))} />
+                            <span className="inline-flex items-center px-4 text-gray-600 bg-gray-100 border border-l-0 border-gray-300 rounded-r-lg">
+                                {goalUnit}
+                            </span>
+                        </div>
+                    </div>
+
+                    {/* Repeat */}
+                    <div>
+                        <label className={styles.formSectionTitle}>Repeat</label>
+                        <div className={styles.segmentedControl}>
+                            <button onClick={() => setRepeatFrequency('daily')} className={`${styles.segmentedControlButton} ${repeatFrequency === 'daily' ? styles.segmentedControlButtonSelected : ''}`}>Daily</button>
+                            <button onClick={() => setRepeatFrequency('weekly')} className={`${styles.segmentedControlButton} ${repeatFrequency === 'weekly' ? styles.segmentedControlButtonSelected : ''}`}>Weekly</button>
+                        </div>
+                    </div>
+
+                    {/* --- SUBTASKS (Corrected Layout) --- */}
+                    <div>
+                        <label className={styles.formSectionTitle}>Subtasks (Optional)</label>
+                        {/* List of added subtasks */}
+                        <div className={styles.subtaskList}>
+                            {Object.entries(subtasks).map(([id, subtask]) => (
+                                <div key={id} className={styles.subtaskItem}>
+                                    <p className="form-input bg-transparent border-none p-0 flex-grow">{subtask.text}</p>
+                                    <button onClick={() => handleRemoveSubtask(id)} className={styles.subtaskDeleteButton}>
+                                        <FiTrash2 size={16} />
+                                    </button>
                                 </div>
                             ))}
                         </div>
-                    </div>
-
-                    {/* Icon Picker */}
-                    <div>
-                        <label className={styles.formSectionTitle}>Icon</label>
-                        <div className={styles.iconPickerGrid}>
-                            {Object.keys(iconOptions).map(iconName => {
-                                const Icon = iconOptions[iconName as keyof typeof iconOptions];
-                                return (
-                                    <div
-                                        key={iconName}
-                                        onClick={() => setSelectedIcon(iconName)}
-                                        className={`${styles.iconSwatch} ${selectedIcon === iconName ? styles.iconSwatchSelected : ''}`}
-                                    >
-                                        <Icon size={22} />
-                                    </div>
-                                );
-                            })}
+                        {/* Input for adding a new subtask */}
+                        <div className="flex items-center gap-2 mt-2">
+                            {/* WRAP THE ICON IN A BUTTON TAG */}
+                            <button
+                                type="button" // Important for forms to prevent accidental submission
+                                onClick={handleAddSubtask}
+                                className="text-gray-400 hover:text-indigo-600 transition-colors"
+                                title="Add Subtask"
+                            >
+                                <FiPlusCircle size={20} />
+                            </button>
+                            <input
+                                type="text"
+                                className="form-input flex-grow bg-transparent border-none p-0 focus:ring-0"
+                                placeholder="Add a new subtask and tap the '+' icon"
+                                value={newSubtaskText}
+                                onChange={(e) => setNewSubtaskText(e.target.value)}
+                                onKeyDown={(e) => {
+                                    if (e.key === 'Enter') {
+                                        e.preventDefault();
+                                        handleAddSubtask();
+                                    }
+                                }}
+                            />
                         </div>
                     </div>
+                </div>
 
-                    <div className="pt-4 flex justify-end">
-                        <button className="btn-primary" onClick={handleSave}>Save Habit</button>
-                    </div>
+                {/* --- FOOTER --- */}
+                <div className="flex-shrink-0 px-6 py-4 border-t bg-gray-50 flex justify-end">
+                    <button className="btn-primary" onClick={handleSave}>Save Habit</button>
                 </div>
             </div>
         </div>

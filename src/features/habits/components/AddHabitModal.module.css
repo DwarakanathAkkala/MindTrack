@@ -1,6 +1,6 @@
 /*
- * Corrected CSS Module for AddHabitModal
- * Contains robust centering and all self-contained styles.
+ * FINAL CSS Module for AddHabitModal
+ * Contains all self-contained styles for the modal.
  */
 
 .modalBackdrop {
@@ -9,26 +9,26 @@
   left: 0;
   width: 100%;
   height: 100%;
-  z-index: 100; /* High z-index to ensure it's on top */
+  z-index: 100;
   display: flex;
   align-items: center;
   justify-content: center;
   padding: 1rem;
-  background-color: rgba(17, 24, 39, 0.3); /* gray-900 with 30% opacity */
+  background-color: rgba(17, 24, 39, 0.3);
   backdrop-filter: blur(4px);
-  -webkit-backdrop-filter: blur(4px); /* For Safari browser support */
+  -webkit-backdrop-filter: blur(4px);
 }
 
 .formErrorText {
-  color: #EF4444; /* red-500 */
-  font-size: 0.875rem; /* text-sm */
+  color: #EF4444;
+  font-size: 0.875rem;
   margin-top: 0.25rem;
 }
 
 .formSectionTitle {
-  font-size: 0.875rem; /* text-sm */
+  font-size: 0.875rem;
   font-weight: 700;
-  color: #6B7280; /* gray-500 */
+  color: #6B7280;
   text-transform: uppercase;
   letter-spacing: 0.05em;
   margin-top: 1.5rem;
@@ -52,12 +52,13 @@
   align-items: center;
   justify-content: center;
 }
+
 .colorSwatch:hover {
   transform: scale(1.1);
 }
 
 .colorSwatchSelected {
-  box-shadow: 0 0 0 2px #fff, 0 0 0 4px #4F46E5; /* ring-2 ring-offset-2 ring-indigo-600 */
+  box-shadow: 0 0 0 2px #fff, 0 0 0 4px #4F46E5;
 }
 
 .iconPickerGrid {
@@ -72,17 +73,68 @@
   border-radius: 0.5rem;
   cursor: pointer;
   transition-property: all;
-  background-color: #F3F4F6; /* gray-100 */
+  background-color: #F3F4F6;
   display: flex;
   align-items: center;
   justify-content: center;
-  color: #4B5563; /* gray-600 */
+  color: #4B5563;
 }
+
 .iconSwatch:hover {
-  background-color: #E5E7EB; /* gray-200 */
+  background-color: #E5E7EB;
 }
 
 .iconSwatchSelected {
-  background-color: #4F46E5; /* indigo-600 */
+  background-color: #4F46E5;
   color: white;
+}
+
+.segmentedControl {
+  display: flex;
+  background-color: #F3F4F6;
+  border-radius: 0.5rem;
+  padding: 0.25rem;
+}
+
+.segmentedControlButton {
+  flex: 1;
+  padding: 0.5rem 0.75rem;
+  border: none;
+  background-color: transparent;
+  border-radius: 0.375rem;
+  font-weight: 500;
+  color: #4B5563;
+  cursor: pointer;
+  transition: all 200ms ease-in-out;
+}
+
+.segmentedControlButtonSelected {
+  background-color: white;
+  color: #111827;
+  box-shadow: 0 1px 3px 0 rgba(0, 0, 0, 0.1), 0 1px 2px -1px rgba(0, 0, 0, 0.1);
+}
+
+.subtaskList {
+  margin-top: 0.5rem;
+  display: flex;
+  flex-direction: column;
+  gap: 0.5rem;
+}
+
+.subtaskItem {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+}
+
+.subtaskDeleteButton {
+  padding: 0.25rem;
+  color: #9CA3AF;
+  border-radius: 9999px;
+  transition: all 200ms;
+}
+
+.subtaskDeleteButton:hover {
+  background-color: #F3F4F6;
+  color: #EF4444;
 }
