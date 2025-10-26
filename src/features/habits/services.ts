@@ -6,7 +6,16 @@ export interface Habit {
     title: string;
     icon: string;
     color: string;
-    // We will add goal, repeat, etc. here in the future
+    goal: {
+        type: 'reps' | 'duration' | 'checklist';
+        target: number;
+        unit: string;
+    };
+    repeat: {
+        frequency: 'daily' | 'weekly';
+        days?: { [key: string]: boolean }; // e.g., { Mon: true, Wed: true }
+    };
+    subtasks: { [id: string]: { text: string; completed: boolean } };
 }
 
 /**
