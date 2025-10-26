@@ -1,6 +1,6 @@
 import { useEffect, useState } from 'react';
 import { useSelector, useDispatch } from 'react-redux';
-import { FiCheck, FiMoreVertical, FiEdit, FiTrash2, FiZap, FiBookOpen, FiCoffee, FiDroplet, FiMoon, FiSun } from 'react-icons/fi';
+import { FiMoreVertical, FiEdit, FiTrash2, FiZap, FiBookOpen, FiCoffee, FiDroplet, FiMoon, FiSun } from 'react-icons/fi';
 import type { RootState, AppDispatch } from '../store/store';
 import type { DialogOptions } from '../components/ui/useConfirmationDialog';
 import { getHabits, listenToHabitLogs, deleteHabit, logHabitCompletion } from '../features/habits/services';
