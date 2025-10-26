@@ -1,0 +1,13 @@
+.statusContainer {
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+    /* space-x-2 */
+}
+
+.statusText {
+    font-size: 0.875rem;
+    /* text-sm */
+    color: #6B7280;
+    /* text-gray-500 */
+}

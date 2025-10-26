@@ -1,0 +1,22 @@
+.quoteCard {
+    background-color: #ECFDF5;
+    /* green-50 */
+    border-left: 4px solid #34D399;
+    /* green-400 */
+    padding: 1rem;
+    border-radius: 0.5rem;
+}
+
+.quoteText {
+    font-style: italic;
+    color: #065F46;
+    /* green-800 */
+}
+
+.quoteAuthor {
+    margin-top: 0.5rem;
+    font-weight: 500;
+    text-align: right;
+    color: #047857;
+    /* green-700 */
+}

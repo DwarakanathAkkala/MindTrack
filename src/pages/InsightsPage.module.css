@@ -1,0 +1,88 @@
+.insightsGrid {
+    display: grid;
+    grid-template-columns: repeat(1, minmax(0, 1fr));
+    gap: 1.5rem;
+}
+
+@media (min-width: 768px) {
+    .insightsGrid {
+        grid-template-columns: repeat(2, minmax(0, 1fr));
+    }
+}
+
+.statCard {
+    background-color: white;
+    border-radius: 1rem;
+    box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1), 0 2px 4px -2px rgba(0, 0, 0, 0.1);
+    padding: 1.5rem;
+}
+
+.statTitle {
+    font-size: 1.125rem;
+    font-weight: 600;
+    color: #4B5563;
+    /* gray-600 */
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+}
+
+.statValue {
+    font-size: 2.25rem;
+    /* text-4xl */
+    font-weight: 700;
+    color: #111827;
+    /* gray-900 */
+    margin-top: 0.5rem;
+}
+
+.statDescription {
+    font-size: 0.875rem;
+    color: #6B7280;
+    /* gray-500 */
+    margin-top: 0.25rem;
+}
+
+.categoryList {
+    margin-top: 1rem;
+    display: flex;
+    flex-direction: column;
+    gap: 1rem;
+}
+
+.categoryItem {
+    display: flex;
+    align-items: center;
+    gap: 1rem;
+}
+
+.categoryColorSwatch {
+    width: 1rem;
+    height: 1rem;
+    border-radius: 9999px;
+    flex-shrink: 0;
+}
+
+.categoryLabel {
+    font-weight: 500;
+    width: 8rem;
+    /* Fixed width for alignment */
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+}
+
+.progressBarBackground {
+    flex-grow: 1;
+    height: 0.75rem;
+    background-color: #F3F4F6;
+    /* gray-100 */
+    border-radius: 9999px;
+    overflow: hidden;
+}
+
+.progressBarFill {
+    height: 100%;
+    border-radius: 9999px;
+    transition: width 500ms ease-in-out;
+}

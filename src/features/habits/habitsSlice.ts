@@ -1,12 +1,25 @@
 import { createSlice } from '@reduxjs/toolkit';
 import type { PayloadAction } from '@reduxjs/toolkit';
 
-// We'll expand this type later
 interface Habit {
-    id: string; // The unique key from Firebase
+    id: string;
     title: string;
-    color: string;
     icon: string;
+    color: string;
+    category: string;
+    goal: {
+        type: 'reps' | 'duration' | 'steps' | 'checklist';
+        target: number;
+        unit: string;
+    };
+    repeat: {
+        frequency: 'daily' | 'weekly';
+        days?: { [key: string]: boolean };
+    };
+    subtasks: { [id: string]: { text: string; completed: boolean } };
+    startDate: string;
+    endDate?: string;
+    reminderTime?: string;
 }
 
 interface HabitsState {
