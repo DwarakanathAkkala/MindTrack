@@ -1,4 +1,4 @@
-import { ref, push, set, onValue, update, remove, get } from 'firebase/database';
+import { ref, push, set, onValue, update, remove, } from 'firebase/database';
 import { db } from '../../lib/firebase';
 
 // Define a type for the habit data for type safety
