@@ -6,7 +6,7 @@ import { useConfirmationDialog } from '../components/ui/useConfirmationDialog';
 import type { DialogOptions } from '../components/ui/useConfirmationDialog';
 import { ConfirmationDialog } from '../components/ui/ConfirmationDialog';
 import { AddHabitModal } from '../features/habits/components/AddHabitModal';
-import { getHabits, listenToHabitLogs, deleteHabit, updateHabit, logHabitCompletion } from '../features/habits/services';
+import { getHabits, listenToHabitLogs, deleteHabit, logHabitCompletion } from '../features/habits/services';
 import { setHabits, setHabitsStatus } from '../features/habits/habitsSlice';
 import { setLogs } from '../features/habits/logsSlice';
 import { signOutUser } from '../features/auth/services';
