@@ -22,7 +22,7 @@ export function AddHabitModal({ isOpen, onClose, habitToEdit }: AddHabitModalPro
     const [titleError, setTitleError] = useState<string | null>(null);
     const [selectedColor, setSelectedColor] = useState(colorOptions[0]);
     const [selectedIcon, setSelectedIcon] = useState('FiZap');
-    const [goalType, setGoalType] = useState<'reps' | 'duration'>('reps');
+    const [goalType, setGoalType] = useState<'reps' | 'steps' | 'duration'>('reps');
     const [goalTarget, setGoalTarget] = useState<number>(1);
     const [goalUnit, setGoalUnit] = useState('times');
     const [repeatFrequency, setRepeatFrequency] = useState<'daily' | 'weekly'>('daily');
@@ -133,6 +133,7 @@ export function AddHabitModal({ isOpen, onClose, habitToEdit }: AddHabitModalPro
                         <label className={styles.formSectionTitle}>Goal</label>
                         <div className={styles.segmentedControl}>
                             <button onClick={() => { setGoalType('reps'); setGoalUnit('times'); }} className={`${styles.segmentedControlButton} ${goalType === 'reps' ? styles.segmentedControlButtonSelected : ''}`}>Reps</button>
+                            <button onClick={() => { setGoalType('steps'); setGoalUnit('steps'); }} className={`${styles.segmentedControlButton} ${goalType === 'steps' ? styles.segmentedControlButtonSelected : ''}`}>Steps</button>
                             <button onClick={() => { setGoalType('duration'); setGoalUnit('minutes'); }} className={`${styles.segmentedControlButton} ${goalType === 'duration' ? styles.segmentedControlButtonSelected : ''}`}>Duration</button>
                         </div>
                         <div className="flex mt-3">

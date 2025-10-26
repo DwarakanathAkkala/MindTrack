@@ -7,7 +7,7 @@ export interface Habit {
     icon: string;
     color: string;
     goal: {
-        type: 'reps' | 'duration' | 'checklist';
+        type: 'reps' | 'steps' | 'duration' | 'checklist';
         target: number;
         unit: string;
     };
