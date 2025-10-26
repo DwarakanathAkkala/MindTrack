@@ -1,0 +1,146 @@
+.sharePageContainer {
+    min-height: 100vh;
+    background-color: #F9FAFB;
+    /* gray-50 */
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    padding: 1rem;
+    text-align: center;
+}
+
+.shareCard {
+    background: white;
+    border-radius: 1.5rem;
+    /* rounded-3xl */
+    padding: 1.5rem;
+    /* Reduced padding for mobile */
+    box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.25);
+    max-width: 400px;
+    width: 100%;
+}
+
+/* On larger screens, increase the padding */
+@media (min-width: 640px) {
+    .shareCard {
+        padding: 2rem;
+    }
+}
+
+.avatar {
+    width: 5rem;
+    /* w-20, smaller for mobile */
+    height: 5rem;
+    /* h-20 */
+    border-radius: 9999px;
+    object-fit: cover;
+    margin-left: auto;
+    margin-right: auto;
+    border: 4px solid white;
+    box-shadow: 0 10px 15px -3px rgba(0, 0, 0, 0.1);
+}
+
+@media (min-width: 640px) {
+    .avatar {
+        width: 6rem;
+        /* w-24 */
+        height: 6rem;
+        /* h-24 */
+    }
+}
+
+.userName {
+    margin-top: 1rem;
+    font-size: 1.5rem;
+    /* text-2xl, smaller for mobile */
+    font-weight: 700;
+    color: #111827;
+    /* gray-900 */
+}
+
+@media (min-width: 640px) {
+    .userName {
+        font-size: 1.875rem;
+        /* text-3xl */
+    }
+}
+
+.shareMessage {
+    margin-top: 0.25rem;
+    font-size: 1rem;
+    /* text-base, smaller for mobile */
+    color: #6B7280;
+    /* gray-500 */
+}
+
+@media (min-width: 640px) {
+    .shareMessage {
+        font-size: 1.125rem;
+        /* text-lg */
+    }
+}
+
+.streakDisplay {
+    margin-top: 1.5rem;
+    background-image: linear-gradient(to top right, #FDBA74, #F97316);
+    /* orange gradient */
+    color: white;
+    border-radius: 1rem;
+    padding: 1rem;
+    /* Reduced padding */
+}
+
+@media (min-width: 640px) {
+    .streakDisplay {
+        padding: 1.5rem;
+    }
+}
+
+.streakNumber {
+    font-size: 3rem;
+    /* text-5xl, smaller for mobile */
+    font-weight: 800;
+    /* font-extrabold */
+    line-height: 1;
+}
+
+@media (min-width: 640px) {
+    .streakNumber {
+        font-size: 4rem;
+        /* text-7xl */
+    }
+}
+
+.streakLabel {
+    margin-top: 0.25rem;
+    font-size: 1rem;
+    /* text-base */
+    font-weight: 600;
+    letter-spacing: 0.05em;
+    text-transform: uppercase;
+}
+
+@media (min-width: 640px) {
+    .streakLabel {
+        font-size: 1.25rem;
+    }
+}
+
+.ctaLink {
+    margin-top: 1.5rem;
+    padding-top: 1rem;
+    border-top: 1px solid #E5E7EB;
+    /* border-gray-200 */
+    font-weight: 600;
+    /* font-semibold */
+    color: green;
+    /* indigo-600 */
+    transition: color 200ms;
+    display: block;
+    /* Make it a block for better spacing */
+}
+
+.ctaLink:hover {
+    color: #8dd9b3;
+}

@@ -9,7 +9,7 @@ export function LandingPage() {
             {/* Header with Logo */}
             <header className="absolute top-0 left-0 w-full p-6">
                 <div className="flex items-center gap-3">
-                    <img src={logoSrc} alt="MindTrack Logo" className="h-20 w-20" />
+                    <img src={logoSrc} alt="Better You Logo" className="h-20 w-20" />
                     <span className="text-xl font-bold text-gray-800">Better You</span>
                 </div>
             </header>
