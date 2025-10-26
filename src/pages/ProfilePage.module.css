@@ -1,0 +1,55 @@
+.profileLayout {
+    display: grid;
+    grid-template-columns: repeat(1, minmax(0, 1fr));
+    gap: 1.5rem;
+}
+
+@media (min-width: 1024px) {
+    .profileLayout {
+        grid-template-columns: repeat(3, minmax(0, 1fr));
+    }
+}
+
+.mainContent {
+    grid-column: span 1 / span 1;
+}
+
+@media (min-width: 1024px) {
+    .mainContent {
+        grid-column: span 2 / span 2;
+    }
+}
+
+.sidebar {
+    grid-column: span 1 / span 1;
+}
+
+.inputGroup {
+    display: flex;
+    flex-direction: column;
+    gap: 1rem;
+}
+
+@media (min-width: 640px) {
+    .inputGroup {
+        flex-direction: row;
+    }
+}
+
+.privacyCard {
+    /* blue-50 */
+    background-color: #EFF6FF;
+    /* blue-500 */
+    border-left: 4px solid #3B82F6;
+    padding: 1rem;
+    border-radius: 0.5rem;
+    display: flex;
+    align-items: center;
+    gap: 1rem;
+}
+
+.privacyText {
+    font-size: 0.875rem;
+    /* blue-800 */
+    color: #1E40AF;
+}
