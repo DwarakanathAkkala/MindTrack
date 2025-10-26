@@ -3,7 +3,7 @@
 ![Better You Landing Page](./src/assets/landing-page.webp)
 
 ## Introduction
-Better You is a dynamic, client-side web application designed to help you build lasting habits, balance your mind, and achieve your personal wellness goals. It provides users with a comprehensive, single-page platform to organize their self-improvement journey. From creating highly detailed, customizable habits and visualizing progress on a streak calendar to receiving motivational boosts and analyzing personal insights, Better You aims to make wellness planning structured, enjoyable, and elegant. This project leverages the power of Firebase for its backend services, including authentication and a real-time database, to create a seamless and responsive user experience.
+Better You is a dynamic, client-side web application designed to help you build lasting habits, balance your mind, and achieve your personal wellness goals. It provides users with a comprehensive, single-page platform to organize their self-improvement journey. From creating highly detailed, customizable habits and visualizing progress on a streak calendar to receiving motivational boosts and analyzing personal insights, MindTrack aims to make wellness planning structured, enjoyable, and elegant. This project leverages the power of Firebase for its backend services, including authentication and a real-time database, to create a seamless and responsive user experience.
 
 ## Project Type
 Frontend | Serverless Backend (Firebase)
@@ -13,89 +13,32 @@ Frontend | Serverless Backend (Firebase)
 
 **Database:** The project uses Google's Firebase Realtime Database, which can be viewed in the [Firebase Console](https://console.firebase.google.com/) (requires project access).
 
-## Directory Structure
-mindtrack/
-├── public/
-│ └── hero-illustration.svg
-│ └── logo.png
-│
-├── src/
-│ ├── assets/
-│ │ └── logo.png
-│ ├── components/
-│ │ ├── layout/
-│ │ │ └── MainLayout.tsx
-│ │ └── ui/
-│ │ ├── ConfirmationDialog.tsx
-│ │ ├── ConfirmationDialog.module.css
-│ │ ├── MotivationalMessage.tsx
-│ │ ├── MotivationalMessage.module.css
-│ │ ├── ReminderManager.tsx
-│ │ ├── ReminderManager.module.css
-│ │ └── useConfirmationDialog.ts
-│ ├── features/
-│ │ ├── auth/
-│ │ │ ├── components/
-│ │ │ │ └── AuthListener.tsx
-│ │ │ ├── authSlice.ts
-│ │ │ └── services.ts
-│ │ ├── habits/
-│ │ │ ├── components/
-│ │ │ │ ├── AddHabitModal.tsx
-│ │ │ │ └── AddHabitModal.module.css
-│ │ │ ├── habitsSlice.ts
-│ │ │ ├── logsSlice.ts
-│ │ │ └── services.ts
-│ │ ├── user/
-│ │ │ ├── userSlice.ts
-│ │ │ └── services.ts
-│ │ └── ... (onboarding, etc.)
-│ ├── hooks/
-│ │ └── useReminder.ts
-│ ├── lib/
-│ │ └── firebase.ts
-│ ├── pages/
-│ │ ├── DashboardPage.tsx
-│ │ ├── InsightsPage.tsx
-│ │ ├── InsightsPage.module.css
-│ │ ├── LandingPage.tsx
-│ │ └── OnboardingPage.tsx
-│ ├── router/
-│ │ └── AppRouter.tsx
-│ ├── index.css
-│ └── ... (main.tsx, App.tsx, etc.)
-│
-├── .env.local (For Firebase API Keys)
-├── vercel.json (For Vercel deployment routing)
-└── package.json
-code
-Code
 ## Features
-- **Secure & Seamless Authentication:** Users can sign up or log in instantly and securely using their Google account.
-- **Personalized Onboarding:** A one-time, multi-step onboarding flow collects the user's name and focus areas (Fitness, Sleep, etc.) to tailor the experience from the start.
-- **Rich Habit Creation & Management:** A central dashboard where users can perform full CRUD operations (Create, Read, Update, Delete) on their habits. The habit creation modal allows for deep customization:
+- **Secure & Seamless Authentication:** Users can sign up or log in instantly and securely using their Google account. The header features a modern profile picture dropdown for accessing the profile and signing out.
+- **Personalized Onboarding & Profile:** A one-time onboarding flow collects initial user goals. A dedicated **Profile Page** allows users to update personal data like height, weight, and birth date, with a clear assurance of data privacy.
+- **Rich Habit Creation & Management:** A central dashboard with full CRUD (Create, Read, Update, Delete) functionality for habits. The habit creation modal allows for deep customization:
     -   **Categorization:** Assign a custom category (e.g., "Health," "Work").
-    -   **Visuals:** Choose a unique color and icon for each habit.
-    -   **Goals:** Set specific targets based on **Reps**, **Duration**, or **Steps**.
-    -   **Scheduling:** Define a **Start Date** and an optional **End Date**.
-    -   **Reminders:** Set an optional **Reminder Time** to receive browser notifications.
-    -   **Subtasks:** Break down complex habits into smaller, manageable steps.
-- **Dynamic Dashboard:** The main view provides an at-a-glance list of "Today's Habits," which can be marked complete with a single click, providing immediate visual feedback.
-- **Visual Streak Calendar:** A powerful calendar that visualizes user consistency:
-    -   **Daily Status:** Days are automatically colored: a **yellow ring** for partial completion and a **solid green circle** for completing all habits.
-    -   **Streak Visualization:** Consecutive completed days are visually linked with a continuous bar to form a "streak snake."
-    -   **Streak Counter:** The current day-streak is prominently displayed with a 🔥 emoji for motivation.
-- **Progress Insights Page:** A dedicated page that provides clear, data-driven reports and summaries of a user's progress, including overall completion percentages and a breakdown of performance by category.
+    -   **Visuals:** Choose a unique color and icon.
+    -   **Goals & Subtasks:** Set targets based on **Reps**, **Duration**, or **Steps**, and break down complex habits into smaller subtasks.
+    -   **Scheduling & Reminders:** Define a **Start/End Date** and set an optional **Reminder Time** to receive browser notifications.
+- **Dynamic Dashboard & Navigation:** A persistent two-column layout ensures a consistent user experience. The left column displays page content, while the right sidebar contains permanent navigation and calendar widgets.
+- **Month-by-Month Streak Calendar:** An interactive calendar that visualizes user consistency with month-wise navigation:
+    -   **Daily Status:** Days are colored with a **yellow ring** for partial completion and a **solid green circle** for completing all habits.
+    -   **Streak Visualization:** Consecutive completed days are visually linked with a continuous "streak snake."
+    -   **Streak Counter:** The current day-streak is prominently displayed with a 🔥 emoji.
+- **Data-Driven Insights Page:** A dedicated analytics page with month/year filters, providing clear reports on **Overall Completion Percentage** and a performance breakdown by **Habit Category**.
+- **Achievements & Sharing:**
+    -   **Rewards:** Users earn badges for reaching milestones (3-day, 7-day, 30-day streaks) which are displayed on the dashboard.
+    -   **Native Mobile Sharing:** The "Share" button uses the **Web Share API** to open the native share sheet on mobile devices for a seamless experience.
+    -   **Public Share Page:** Generates a unique, public, read-only page to showcase a user's streak and achievements, complete with a celebratory confetti effect and a call-to-action for new users to sign up.
 - **Motivational Boosts:** The dashboard includes a daily motivational quote to keep users inspired.
-- **Browser Notifications:** An opt-in reminder system that uses the browser's native Notification API to alert users when it's time to complete a habit.
-- **Elegant & Responsive Design:** The entire application is built with a mobile-first approach and features a clean, modern UI with smooth animations and a consistent layout.
 
 ## Design Decisions or Assumptions
-- **Serverless Architecture:** I chose Firebase for all backend services (Auth, Realtime Database) to create a powerful, real-time application without needing to manage a server. This simplifies deployment and scaling.
-- **Component-Scoped & Global CSS:** The project uses a hybrid styling approach. Global, reusable utility classes (like `.btn-primary`) are defined in `index.css` using Tailwind's `@apply`. Complex, component-specific styles (like for modals) are encapsulated in CSS Modules (`*.module.css`) to improve organization and prevent style collisions.
+- **Serverless Architecture:** I chose Firebase for all backend services (Auth, Realtime Database) to create a powerful, real-time application without needing to manage a server.
+- **Component-Scoped & Global CSS:** The project uses a hybrid styling approach. Global, reusable utility classes (like `.btn-primary`) are defined in `index.css` using Tailwind's `@apply`. Complex, component-specific styles are encapsulated in CSS Modules (`*.module.css`) to improve organization.
 - **State Management:** Redux Toolkit is used as a single source of truth for all application state (user session, habits, logs), ensuring a predictable and reactive UI.
-- **Custom Hooks:** Logic for complex, reusable UI patterns (like the confirmation dialog) is abstracted into custom hooks (`useConfirmationDialog`) to keep component code clean and declarative.
-- **Client-Side SPA Routing:** The application uses React Router to handle all navigation on the client side. A rewrite rule in `vercel.json` ensures that direct navigation to any route works correctly in a deployed environment.
+- **Custom Hooks:** Logic for complex, reusable UI patterns (like the confirmation dialog and calendar) is abstracted into custom hooks (`useConfirmationDialog`, `useCalendar`) to keep component code clean and declarative.
+- **Layout Abstraction:** A central `MainLayout.tsx` component is responsible for the persistent header and two-column grid, while individual pages render their specific content within it.
 
 ## Usage
 1.  Navigate to the deployed app URL or your local server.
