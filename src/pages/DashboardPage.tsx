@@ -1,13 +1,14 @@
 import { useEffect, useState, useMemo } from 'react';
 import { useSelector, useDispatch } from 'react-redux';
-import { FiChevronRight, FiChevronLeft, FiMoreVertical, FiEdit, FiTrash2, FiZap, FiBookOpen, FiCoffee, FiDroplet, FiMoon, FiSun } from 'react-icons/fi';
+import { FiChevronLeft, FiChevronRight, FiMoreVertical, FiEdit, FiTrash2, FiZap, FiBookOpen, FiCoffee, FiDroplet, FiMoon, FiSun } from 'react-icons/fi';
 import type { RootState, AppDispatch } from '../store/store';
 import type { DialogOptions } from '../components/ui/useConfirmationDialog';
+import { useCalendar } from '../hooks/useCalendar';
 import { getHabits, listenToHabitLogs, deleteHabit, logHabitCompletion } from '../features/habits/services';
 import { setHabits, setHabitsStatus } from '../features/habits/habitsSlice';
 import { setLogs } from '../features/habits/logsSlice';
 import { MotivationalMessage } from '../components/ui/MotivationalMessage';
-import { useCalendar } from '../hooks/useCalendar';
+import { Achievements } from '../components/ui/Achievements'; // Import Achievements
 
 const iconMap = { FiZap, FiBookOpen, FiCoffee, FiDroplet, FiMoon, FiSun };
 
@@ -16,6 +17,7 @@ interface DashboardPageProps {
     confirm: (options: DialogOptions) => Promise<boolean>;
 }
 
+// --- Main Page Component (Left Column) ---
 export function DashboardPage({ setModalState, confirm }: DashboardPageProps) {
     const dispatch = useDispatch<AppDispatch>();
     const user = useSelector((state: RootState) => state.auth.user);
@@ -73,6 +75,45 @@ export function DashboardPage({ setModalState, confirm }: DashboardPageProps) {
     );
 }
 
+// --- Sidebar Component (Right Column) ---
+export function DashboardSidebar() {
+    const user = useSelector((state: RootState) => state.auth.user);
+    const habits = useSelector((state: RootState) => state.habits.habits);
+    const logs = useSelector((state: RootState) => state.logs.logs);
+
+    const currentStreak = useMemo(() => {
+        if (!logs || habits.length === 0) return 0;
+        let streak = 0;
+        const today = new Date();
+        for (let i = 0; i < 365; i++) {
+            const dateToCheck = new Date(today);
+            dateToCheck.setDate(today.getDate() - i);
+            const dateStr = dateToCheck.toISOString().split('T')[0];
+            const allHabitsForDay = habits.filter(h => new Date(h.startDate) <= dateToCheck && (!h.endDate || new Date(h.endDate) >= dateToCheck));
+            if (allHabitsForDay.length === 0) {
+                if (i === 0) return 0;
+                break;
+            }
+            if (allHabitsForDay.reduce((count, h) => (logs[h.id]?.[dateStr]?.completed ? count + 1 : count), 0) === allHabitsForDay.length) {
+                streak++;
+            } else {
+                if (i === 0) return 0;
+                break;
+            }
+        }
+        return streak;
+    }, [logs, habits]);
+
+    return (
+        <div className="space-y-6">
+            <div className="widget-card">
+                <Calendar streak={currentStreak} />
+            </div>
+            {user && <Achievements userId={user.uid} streak={currentStreak} />}
+        </div>
+    );
+}
+
 // --- Child Components ---
 function HabitItem({ habit, isCompleted, onToggleComplete, onEdit, onDelete }: {
     habit: any;
@@ -126,10 +167,9 @@ function HabitItem({ habit, isCompleted, onToggleComplete, onEdit, onDelete }: {
     );
 }
 
-export function Calendar() {
+function Calendar({ streak }: { streak: number }) {
     const habits = useSelector((state: RootState) => state.habits.habits);
     const logs = useSelector((state: RootState) => state.logs.logs);
-
     const {
         currentMonth,
         currentYear,
@@ -139,57 +179,19 @@ export function Calendar() {
         goToPreviousMonth
     } = useCalendar();
 
-    const calculateCurrentStreak = () => {
-        if (!logs || habits.length === 0) return 0;
-        let streak = 0;
-        const today = new Date();
-        for (let i = 0; i < 365; i++) {
-            const dateToCheck = new Date(today);
-            dateToCheck.setDate(today.getDate() - i);
-            const dateStr = dateToCheck.toISOString().split('T')[0];
-
-            const allHabitsForDay = habits.filter(h => new Date(h.startDate) <= dateToCheck && (!h.endDate || new Date(h.endDate) >= dateToCheck));
-
-            if (allHabitsForDay.length === 0) {
-                if (i === 0) return 0; // No habits scheduled for today
-                break; // Streak ends if there were no habits scheduled for a past day
-            }
-
-            const completedCount = allHabitsForDay.reduce((count, habit) => {
-                if (logs[habit.id]?.[dateStr]?.completed) {
-                    return count + 1;
-                }
-                return count; // <-- THIS RETURN WAS MISSING
-            }, 0);
-
-            if (completedCount === allHabitsForDay.length) {
-                streak++;
-            } else {
-                if (i === 0) return 0; // Today is not fully complete
-                break; // Streak is broken
-            }
-        }
-        return streak;
-    };
-
-    const currentStreak = calculateCurrentStreak();
-
     const dailyStatuses = useMemo(() => {
         const statuses: { [key: number]: 'none' | 'partial' | 'complete' } = {};
         if (!habits || habits.length === 0) return statuses;
-
         for (const day of calendarDays) {
             if (!day) continue;
             const dateStr = `${currentYear}-${String(currentMonth + 1).padStart(2, '0')}-${String(day).padStart(2, '0')}`;
-
-            const habitsForDay = habits.filter(h => new Date(h.startDate) <= new Date(dateStr) && (!h.endDate || new Date(h.endDate) >= new Date(dateStr)));
+            const dateToCheck = new Date(dateStr);
+            const habitsForDay = habits.filter(h => new Date(h.startDate) <= dateToCheck && (!h.endDate || new Date(h.endDate) >= dateToCheck));
             if (habitsForDay.length === 0) {
                 statuses[day] = 'none';
                 continue;
             }
-
             const completedCount = habitsForDay.reduce((count, habit) => (logs?.[habit.id]?.[dateStr]?.completed ? count + 1 : count), 0);
-
             if (completedCount === 0) statuses[day] = 'none';
             else if (completedCount < habitsForDay.length) statuses[day] = 'partial';
             else statuses[day] = 'complete';
@@ -201,25 +203,22 @@ export function Calendar() {
 
     return (
         <div>
-            <div className="calendar-header">
+            <div className="flex justify-between items-start mb-4">
                 <h2 className="widget-title">{`${monthName} ${currentYear}`}</h2>
                 <div className="flex items-center gap-4">
-                    {currentStreak > 0 && (
+                    {streak > 0 && (
                         <div className="streak-counter">
                             <span className="streak-fire-emoji">🔥</span>
-                            <span>{currentStreak} Day{currentStreak > 1 ? 's' : ''}</span>
+                            <span>{streak} Day{streak > 1 ? 's' : ''}</span>
                         </div>
                     )}
                     <div className="flex items-center">
-                        <button onClick={goToPreviousMonth} className="p-1 rounded-full hover:bg-gray-100">
-                            <FiChevronLeft size={20} />
-                        </button>
-                        <button onClick={goToNextMonth} className="p-1 rounded-full hover:bg-gray-100">
-                            <FiChevronRight size={20} />
-                        </button>
+                        <button onClick={goToPreviousMonth} className="p-1 rounded-full hover:bg-gray-100"><FiChevronLeft size={20} /></button>
+                        <button onClick={goToNextMonth} className="p-1 rounded-full hover:bg-gray-100"><FiChevronRight size={20} /></button>
                     </div>
                 </div>
             </div>
+
             <div className="calendar-grid mt-4">
                 {daysOfWeek.map((day, index) => <div key={`${day}-${index}`} className="calendar-day-header">{day}</div>)}
                 {calendarDays.map((day, index) => {

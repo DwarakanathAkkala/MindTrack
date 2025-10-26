@@ -2,7 +2,7 @@ import { ref, update, get } from 'firebase/database';
 import { db } from '../../lib/firebase'; // Import our initialized database instance
 
 // Define a type for our profile data for better code safety
-interface UserProfile {
+export interface UserProfile {
     name: string;
     focusAreas: string[];
     sleepHours: string;
