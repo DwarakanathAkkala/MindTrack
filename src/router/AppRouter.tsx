@@ -8,6 +8,7 @@ import { LandingPage } from '../pages/LandingPage';
 import { DashboardPage } from '../pages/DashboardPage';
 import { OnboardingPage } from '../pages/OnboardingPage';
 import { InsightsPage } from '../pages/InsightsPage';
+import { ProfilePage } from '../pages/ProfilePage';
 
 // Layout & Modals
 import { MainLayout } from '../components/layout/MainLayout';
@@ -69,6 +70,8 @@ export function AppRouter() {
                     path="/insights"
                     element={user ? <ProtectedRoutes><InsightsPage /></ProtectedRoutes> : <Navigate to="/" />}
                 />
+
+                <Route path="/profile" element={user ? <ProtectedRoutes><ProfilePage /></ProtectedRoutes> : <Navigate to="/" />} />
 
                 <Route path="/onboarding" element={user ? <OnboardingPage /> : <Navigate to="/" />} />
             </Routes>

@@ -1,7 +1,7 @@
 import { useState, useEffect, useRef } from 'react';
 import type { ReactNode } from 'react';
 import { useSelector, useDispatch } from 'react-redux';
-import { NavLink } from 'react-router-dom';
+import { NavLink, Link } from 'react-router-dom';
 import { FiPlus, FiLogOut, FiHome, FiBarChart2, FiUser } from 'react-icons/fi';
 import type { RootState, AppDispatch } from '../../store/store';
 import { signOutUser } from '../../features/auth/services';
@@ -48,10 +48,10 @@ export function MainLayout({ children, onNewHabitClick }: MainLayoutProps) {
         <div className="bg-gray-100 min-h-screen">
             <header className="bg-white shadow-sm p-4 flex justify-between items-center">
                 {/* Left Side: Logo */}
-                <div className="flex items-center gap-3">
+                <Link to="/dashboard" className="flex items-center gap-3">
                     <img src={logoSrc} alt="MindTrack Logo" className="h-10 w-10" />
-                    <span className="text-xl font-bold text-gray-800 hidden sm:block">Better You</span>
-                </div>
+                    <span className="text-xl font-bold text-gray-800 hidden sm:block">MindTrack</span>
+                </Link>
 
                 {/* Right Side: Actions & Profile Menu */}
                 <div className="flex items-center space-x-4">
@@ -79,10 +79,10 @@ export function MainLayout({ children, onNewHabitClick }: MainLayoutProps) {
                                     <p className="font-semibold text-sm truncate">{user?.displayName}</p>
                                     <p className="text-xs text-gray-500 truncate">{user?.email}</p>
                                 </div>
-                                <button className="options-menu-item">
+                                <NavLink to="/profile" className="options-menu-item" onClick={() => setIsProfileMenuOpen(false)}>
                                     <FiUser size={16} className="mr-2" />
                                     Profile
-                                </button>
+                                </NavLink>
                                 <button onClick={handleSignOut} className="options-menu-item text-red-500">
                                     <FiLogOut size={16} className="mr-2" />
                                     Sign Out
