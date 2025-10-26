@@ -5,10 +5,11 @@ import type { RootState } from '../store/store';
 
 // Pages
 import { LandingPage } from '../pages/LandingPage';
-import { DashboardPage } from '../pages/DashboardPage';
+import { DashboardPage, DashboardSidebar } from '../pages/DashboardPage';
 import { OnboardingPage } from '../pages/OnboardingPage';
 import { InsightsPage } from '../pages/InsightsPage';
 import { ProfilePage } from '../pages/ProfilePage';
+import { SharePage } from '../pages/SharePage';
 
 // Layout & Modals
 import { MainLayout } from '../components/layout/MainLayout';
@@ -35,9 +36,12 @@ export function AppRouter() {
 
     const destination = (user && (!userProfile || !userProfile.onboardingCompleted)) ? '/onboarding' : '/dashboard';
 
-    const ProtectedRoutes = ({ children }: { children: React.ReactNode }) => (
+    const ProtectedRoutes = ({ children, sidebar }: { children: React.ReactNode, sidebar?: React.ReactNode }) => (
         <>
-            <MainLayout onNewHabitClick={() => setModalState({ isOpen: true, habitToEdit: null })}>
+            <MainLayout
+                onNewHabitClick={() => setModalState({ isOpen: true, habitToEdit: null })}
+                sidebarContent={sidebar}
+            >
                 {children}
             </MainLayout>
             <AddHabitModal
@@ -62,18 +66,25 @@ export function AppRouter() {
             <Routes>
                 <Route path="/" element={!user ? <LandingPage /> : <Navigate to={destination} />} />
 
+                {/* Public Routes */}
+                <Route path="/share/:userId" element={<SharePage />} />
+                <Route path="/onboarding" element={user ? <OnboardingPage /> : <Navigate to="/" />} />
+
+                {/* Protected Routes using the Layout Wrapper */}
                 <Route
                     path="/dashboard"
-                    element={user ? <ProtectedRoutes><DashboardPage setModalState={setModalState} confirm={confirm} /></ProtectedRoutes> : <Navigate to="/" />}
+                    element={user ? <ProtectedRoutes sidebar={<DashboardSidebar />}><DashboardPage setModalState={setModalState} confirm={confirm} /></ProtectedRoutes> : <Navigate to="/" />}
                 />
                 <Route
                     path="/insights"
-                    element={user ? <ProtectedRoutes><InsightsPage /></ProtectedRoutes> : <Navigate to="/" />}
+                    // THIS IS THE CHANGE: Pass the DashboardSidebar to the /insights route
+                    element={user ? <ProtectedRoutes sidebar={<DashboardSidebar />}><InsightsPage /></ProtectedRoutes> : <Navigate to="/" />}
                 />
-
-                <Route path="/profile" element={user ? <ProtectedRoutes><ProfilePage /></ProtectedRoutes> : <Navigate to="/" />} />
-
-                <Route path="/onboarding" element={user ? <OnboardingPage /> : <Navigate to="/" />} />
+                <Route
+                    path="/profile"
+                    // The profile page has no special sidebar content, which is correct
+                    element={user ? <ProtectedRoutes><ProfilePage /></ProtectedRoutes> : <Navigate to="/" />}
+                />
             </Routes>
         </Router>
     );

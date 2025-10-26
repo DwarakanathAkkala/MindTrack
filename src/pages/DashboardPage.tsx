@@ -8,7 +8,7 @@ import { getHabits, listenToHabitLogs, deleteHabit, logHabitCompletion } from '.
 import { setHabits, setHabitsStatus } from '../features/habits/habitsSlice';
 import { setLogs } from '../features/habits/logsSlice';
 import { MotivationalMessage } from '../components/ui/MotivationalMessage';
-import { Achievements } from '../components/ui/Achievements'; // Import Achievements
+import { Achievements } from '../components/ui/Achievements';
 
 const iconMap = { FiZap, FiBookOpen, FiCoffee, FiDroplet, FiMoon, FiSun };
 

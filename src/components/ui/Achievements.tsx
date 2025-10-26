@@ -24,17 +24,36 @@ export function Achievements({ streak, userId }: AchievementsProps) {
         }));
     }, [streak]);
 
-    const handleCopy = () => {
-        navigator.clipboard.writeText(shareUrl);
-        setCopied(true);
-        setTimeout(() => setCopied(false), 2000);
+    // --- NEW, SMARTER SHARE HANDLER ---
+    const handleShare = async () => {
+        const shareData = {
+            title: 'My Better You Progress',
+            text: `I'm on a ${streak}-day streak! Check out my progress on Better You.`,
+            url: shareUrl,
+        };
+
+        // Check if the Web Share API is available
+        if (navigator.share && navigator.canShare(shareData)) {
+            try {
+                await navigator.share(shareData);
+                console.log("Shared successfully!");
+            } catch (error) {
+                console.error("Error sharing:", error);
+            }
+        } else {
+            // Fallback to copying the link for desktop browsers
+            navigator.clipboard.writeText(shareUrl);
+            setCopied(true);
+            setTimeout(() => setCopied(false), 2000);
+        }
     };
 
     return (
         <div className="widget-card">
             <div className="flex justify-between items-start">
                 <h2 className="widget-title">Achievements</h2>
-                <button onClick={handleCopy} className="btn-secondary !w-auto !text-sm flex items-center gap-2">
+                <button onClick={handleShare} className="btn-secondary !w-auto !text-sm flex items-center gap-2">
+                    {/* We now show a generic 'Share' icon unless it's been copied */}
                     {copied ? <FiCopy /> : <FiShare2 />}
                     {copied ? 'Copied!' : 'Share'}
                 </button>
