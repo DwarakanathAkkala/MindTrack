@@ -1,4 +1,4 @@
-import { FiArrowRight, FiLogIn } from 'react-icons/fi';
+import { FiLogIn } from 'react-icons/fi';
 import { signInWithGoogle } from '../features/auth/services';
 import logoSrc from '../assets/logoIcon.webp';
 import heroSVG from '../assets/hero.svg';
