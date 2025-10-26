@@ -138,3 +138,10 @@
   background-color: #F3F4F6;
   color: #EF4444;
 }
+
+/* Date Input Styles */
+.dateInputContainer {
+  display: flex;
+  /* space-x-4 */
+  gap: 1rem;
+}

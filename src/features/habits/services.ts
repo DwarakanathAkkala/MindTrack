@@ -1,4 +1,4 @@
-import { ref, push, set, onValue, update, remove } from 'firebase/database';
+import { ref, push, set, onValue, update, remove, get } from 'firebase/database';
 import { db } from '../../lib/firebase';
 
 // Define a type for the habit data for type safety
@@ -16,6 +16,8 @@ export interface Habit {
         days?: { [key: string]: boolean }; // e.g., { Mon: true, Wed: true }
     };
     subtasks: { [id: string]: { text: string; completed: boolean } };
+    startDate: string; // Stored as "YYYY-MM-DD"
+    endDate?: string;  // Optional, stored as "YYYY-MM-DD"
 }
 
 /**
@@ -123,4 +125,24 @@ export const deleteHabit = async (userId: string, habitId: string) => {
     } catch (error) {
         console.error("❌ Error deleting habit:", error);
     }
+};
+
+/**
+ * Listens for real-time updates to a user's habit logs.
+ * @param userId The user's ID.
+ * @param callback The function to call with the new logs object.
+ * @returns A function to unsubscribe from the listener.
+ */
+export const listenToHabitLogs = (userId: string, callback: (logs: any) => void) => {
+    const logsRef = ref(db, `habitLogs/${userId}`);
+
+    const unsubscribe = onValue(logsRef, (snapshot) => {
+        if (snapshot.exists()) {
+            callback(snapshot.val());
+        } else {
+            callback(null); // No logs exist
+        }
+    });
+
+    return unsubscribe;
 };
