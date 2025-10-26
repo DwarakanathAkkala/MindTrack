@@ -34,123 +34,24 @@ body {
   @apply w-full bg-gray-200 hover:bg-gray-300 text-black font-bold py-3 px-4 rounded-lg text-lg transition-colors;
 }
 
+/* Dashboard & Header Styles */
 .btn-primary-header {
-  /* On mobile, it's smaller. On larger screens, it uses the standard btn-primary padding. */
   @apply flex items-center bg-indigo-600 hover:bg-indigo-700 text-white font-bold py-2 px-3 sm:py-3 sm:px-4 rounded-lg text-sm sm:text-base transition-all;
 }
 
-/* Onboarding Styles (Corrected) */
-.onboarding-container {
-  /* Uses Tailwind's built-in color utilities */
-  @apply flex flex-col justify-center min-h-screen bg-gray-100 p-4 sm:p-6;
-}
-
-.onboarding-card {
-  @apply w-full max-w-lg mx-auto bg-white rounded-2xl shadow-xl border p-6 sm:p-8;
-}
-
-.onboarding-header {
-  /* Uses Tailwind's built-in color utilities */
-  @apply text-2xl sm:text-3xl font-bold text-gray-800 text-center;
-}
-
-.progress-bar-background {
-  @apply w-full bg-gray-200 rounded-full h-2 my-6;
-}
-
-.progress-bar-fill {
-  /* Uses a built-in color for the primary action color */
-  @apply bg-indigo-600 h-2 rounded-full transition-all duration-500 ease-in-out;
-}
-
-.form-label {
-  /* Uses Tailwind's built-in color utilities */
-  @apply block text-sm font-medium text-gray-600 mb-2;
-}
-
-.form-input {
-  /* Uses Tailwind's built-in color utilities */
-  @apply w-full px-4 py-3 bg-gray-100 border-gray-300 rounded-lg focus:ring-indigo-600 focus:border-indigo-600;
-}
-
-.focus-card-grid {
-  @apply grid grid-cols-2 gap-4 mt-4;
-}
-
-.focus-card {
-  @apply flex flex-col items-center justify-center p-4 border-2 rounded-lg cursor-pointer transition-all duration-200;
-}
-
-.focus-card-selected {
-  /* Uses Tailwind's built-in color utilities */
-  @apply border-indigo-600 bg-indigo-50 text-indigo-600;
-}
-
-.focus-card-default {
-  @apply border-gray-200 bg-white;
-}
-
-.question-card {
-  @apply text-left p-4 border-2 rounded-lg mt-4 transition-all duration-200;
-}
-
-.question-title {
-  @apply font-semibold text-gray-700;
-}
-
-.question-options {
-  @apply flex space-x-2 mt-2;
-}
-
-.option-button {
-  @apply px-3 py-1 text-sm border-2 rounded-full cursor-pointer transition-all duration-200;
-}
-
-.option-button-selected {
-  @apply bg-indigo-600 border-indigo-600 text-white;
-}
-
-.option-button-default {
-  @apply bg-white border-gray-300 text-gray-600;
-}
-
-/* Animation Utility (No changes needed here) */
-.fade-in-up {
-  animation: fadeInUp 0.5s ease-in-out forwards;
-  opacity: 0;
-}
-
-@keyframes fadeInUp {
-  from {
-    opacity: 0;
-    transform: translateY(10px);
-  }
-
-  to {
-    opacity: 1;
-    transform: translateY(0);
-  }
-}
-
-/* Dashboard & Habit Styles */
-
 .dashboard-grid {
-  /* A responsive grid for the main dashboard layout */
   @apply grid grid-cols-1 lg:grid-cols-3 gap-6 p-4 sm:p-6;
 }
 
 .dashboard-main-content {
-  /* The area for habits and other primary items */
   @apply lg:col-span-2;
 }
 
 .dashboard-sidebar {
-  /* The area for the calendar and summary */
-  @apply lg:col-span-1;
+  @apply lg:col-span-1 space-y-6;
 }
 
 .widget-card {
-  /* A generic card for dashboard widgets like calendar, summary, etc. */
   @apply bg-white rounded-2xl shadow-lg border p-6;
 }
 
@@ -158,9 +59,25 @@ body {
   @apply text-xl font-bold text-gray-800 mb-4;
 }
 
+.form-label {
+  @apply block text-sm font-medium text-gray-600 mb-2;
+}
+
+.form-input {
+  @apply w-full px-4 py-3 bg-gray-100 border-gray-300 rounded-lg focus:ring-indigo-600 focus:border-indigo-600;
+}
+
 /* Habit Item Styles */
 .habit-item {
   @apply flex items-center bg-white rounded-2xl shadow-md border p-4 transition-all duration-200 hover:shadow-lg;
+}
+
+.habit-item-completed {
+  @apply opacity-60 bg-gray-50;
+}
+
+.habit-title-completed {
+  @apply line-through text-gray-500;
 }
 
 .habit-icon-container {
@@ -179,20 +96,6 @@ body {
   @apply w-8 h-8 rounded-full border-2 flex-shrink-0 cursor-pointer transition-all duration-200;
 }
 
-
-/* Habit Interaction Styles */
-
-.habit-item-completed {
-  /* A subtle style to show the whole item is done */
-  @apply opacity-60 bg-gray-50;
-}
-
-.habit-title-completed {
-  /* Add a line-through to the title */
-  @apply line-through text-gray-500;
-}
-
-/* "More Options" Dropdown Menu */
 .options-menu-button {
   @apply p-1 rounded-full text-gray-400 hover:bg-gray-100 hover:text-gray-700 transition-colors;
 }
@@ -206,7 +109,6 @@ body {
 }
 
 /* Preset Color Classes */
-/* We will use these for both the icon background and the checkbox border/fill */
 .color-blue {
   @apply bg-blue-500 border-blue-500;
 }
@@ -235,7 +137,19 @@ body {
   @apply bg-teal-500 border-teal-500;
 }
 
-/* Calendar Styles V2 (Corrected & Complete) */
+/* Calendar Styles */
+.calendar-header {
+  @apply flex justify-between items-center mb-4;
+}
+
+.streak-counter {
+  @apply flex items-center gap-2 px-3 py-1 bg-orange-100 text-orange-600 rounded-full font-semibold;
+}
+
+.streak-fire-emoji {
+  @apply text-lg;
+}
+
 .calendar-grid {
   @apply grid grid-cols-7 gap-1 text-center items-center;
 }
@@ -256,9 +170,7 @@ body {
   @apply bg-transparent text-gray-700;
 }
 
-/* THIS IS THE MISSING CLASS */
 .status-partial {
-  /* Using a thicker ring for better visibility */
   @apply ring-4 ring-yellow-400 bg-yellow-50 text-yellow-700;
 }
 
@@ -280,16 +192,29 @@ body {
   @apply right-0;
 }
 
-/* Calendar Streak Header Styles */
-
-.calendar-header {
-  @apply flex justify-between items-center mb-4;
+/* Main Navigation Link */
+.main-nav-link {
+  @apply flex items-center gap-3 px-4 py-2 rounded-lg text-lg font-semibold text-gray-600 hover:bg-gray-100 transition-colors;
 }
 
-.streak-counter {
-  @apply flex items-center gap-2 px-3 py-1 bg-orange-100 text-orange-600 rounded-full font-semibold;
+.main-nav-link-active {
+  @apply bg-indigo-50 text-indigo-600;
 }
 
-.streak-fire-emoji {
-  @apply text-lg;
+/* Animation Utility */
+.fade-in-up {
+  animation: fadeInUp 0.5s ease-in-out forwards;
+  opacity: 0;
+}
+
+@keyframes fadeInUp {
+  from {
+    opacity: 0;
+    transform: translateY(10px);
+  }
+
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
 }

@@ -1,89 +1,69 @@
-import { ref, push, set, onValue, update, remove, } from 'firebase/database';
+import { ref, push, set, onValue, update, remove } from 'firebase/database';
 import { db } from '../../lib/firebase';
 
-// Define a type for the habit data for type safety
 export interface Habit {
     title: string;
     icon: string;
     color: string;
+    category: string;
     goal: {
-        type: 'reps' | 'steps' | 'duration' | 'checklist';
+        type: 'reps' | 'duration' | 'steps' | 'checklist';
         target: number;
         unit: string;
     };
     repeat: {
         frequency: 'daily' | 'weekly';
-        days?: { [key: string]: boolean }; // e.g., { Mon: true, Wed: true }
+        days?: { [key: string]: boolean };
     };
     subtasks: { [id: string]: { text: string; completed: boolean } };
-    startDate: string; // Stored as "YYYY-MM-DD"
-    endDate?: string;  // Optional, stored as "YYYY-MM-DD"
+    startDate: string;
+    endDate?: string;
+    reminderTime?: string;
 }
 
-/**
- * Creates a new habit for a specific user in the database.
- * @param userId The unique ID of the user.
- * @param habitData The data for the new habit.
- */
-export const createHabit = async (userId: string, habitData: Habit) => {
+export const createHabit = async (userId: string, habitData: Omit<Habit, 'id'>) => {
     try {
-        // Create a reference to the user's list of habits
         const habitsRef = ref(db, `habits/${userId}`);
-
-        // 'push' generates a new unique key (like a habitId) in the list
         const newHabitRef = push(habitsRef);
-
-        // 'set' the data for the new habit at that unique key
         await set(newHabitRef, {
             ...habitData,
-            createdAt: new Date().toISOString(), // Add a timestamp
+            createdAt: new Date().toISOString(),
         });
-
         console.log("✅ New habit created successfully!");
     } catch (error) {
         console.error("❌ Error creating new habit:", error);
     }
 };
 
-
-/**
- * Listens for real-time updates to a user's habits.
- * @param userId The unique ID of the user.
- * @param callback The function to call with the new list of habits.
- * @returns A function to unsubscribe from the listener.
- */
-export const getHabits = (userId: string, callback: (habits: any[]) => void) => { // 2. Add the new function
+export const getHabits = (userId: string, callback: (habits: (Habit & { id: string })[]) => void) => {
     const habitsRef = ref(db, `habits/${userId}`);
-
-    // onValue sets up the listener. It will fire once immediately, and then
-    // again every time the data at this location changes.
     const unsubscribe = onValue(habitsRef, (snapshot) => {
         if (snapshot.exists()) {
             const habitsData = snapshot.val();
-            // Firebase returns an object, so we convert it to an array
             const habitsArray = Object.keys(habitsData).map(key => ({
                 id: key,
                 ...habitsData[key],
             }));
             callback(habitsArray);
         } else {
-            // If no habits exist, return an empty array
             callback([]);
         }
     });
-
-    // Return the unsubscribe function so we can stop listening later
     return unsubscribe;
-}
+};
 
+export const listenToHabitLogs = (userId: string, callback: (logs: any) => void) => {
+    const logsRef = ref(db, `habitLogs/${userId}`);
+    const unsubscribe = onValue(logsRef, (snapshot) => {
+        if (snapshot.exists()) {
+            callback(snapshot.val());
+        } else {
+            callback(null);
+        }
+    });
+    return unsubscribe;
+};
 
-/**
- * Logs the completion status of a habit for a specific day.
- * @param userId The user's ID.
- * @param habitId The ID of the habit.
- * @param date The date in YYYY-MM-DD format.
- * @param completed The completion status.
- */
 export const logHabitCompletion = async (userId: string, habitId: string, date: string, completed: boolean) => {
     try {
         const logRef = ref(db, `habitLogs/${userId}/${habitId}/${date}`);
@@ -94,12 +74,6 @@ export const logHabitCompletion = async (userId: string, habitId: string, date: 
     }
 };
 
-/**
- * Updates the data for an existing habit.
- * @param userId The user's ID.
- * @param habitId The ID of the habit to update.
- * @param updates An object containing the fields to update.
- */
 export const updateHabit = async (userId: string, habitId: string, updates: Partial<Habit>) => {
     try {
         const habitRef = ref(db, `habits/${userId}/${habitId}`);
@@ -110,39 +84,14 @@ export const updateHabit = async (userId: string, habitId: string, updates: Part
     }
 };
 
-
-/**
- * Deletes a specific habit for a user.
- * @param userId The user's ID.
- * @param habitId The ID of the habit to delete.
- */
 export const deleteHabit = async (userId: string, habitId: string) => {
     try {
         const habitRef = ref(db, `habits/${userId}/${habitId}`);
         await remove(habitRef);
-        // We should also delete the habit's logs, but we'll add that later for simplicity.
-        console.log("✅ Habit deleted successfully!");
+        const logRef = ref(db, `habitLogs/${userId}/${habitId}`);
+        await remove(logRef);
+        console.log("✅ Habit and logs deleted successfully!");
     } catch (error) {
         console.error("❌ Error deleting habit:", error);
     }
-};
-
-/**
- * Listens for real-time updates to a user's habit logs.
- * @param userId The user's ID.
- * @param callback The function to call with the new logs object.
- * @returns A function to unsubscribe from the listener.
- */
-export const listenToHabitLogs = (userId: string, callback: (logs: any) => void) => {
-    const logsRef = ref(db, `habitLogs/${userId}`);
-
-    const unsubscribe = onValue(logsRef, (snapshot) => {
-        if (snapshot.exists()) {
-            callback(snapshot.val());
-        } else {
-            callback(null); // No logs exist
-        }
-    });
-
-    return unsubscribe;
 };
