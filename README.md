@@ -3,7 +3,7 @@
 ![Better You Landing Page](./src/assets/landing-page.webp)
 
 ## Introduction
-Better You is a dynamic, client-side web application designed to help you build lasting habits, balance your mind, and achieve your personal wellness goals. It provides users with a comprehensive, single-page platform to organize their self-improvement journey. From creating highly detailed, customizable habits and visualizing progress on a streak calendar to receiving motivational boosts and analyzing personal insights, MindTrack aims to make wellness planning structured, enjoyable, and elegant. This project leverages the power of Firebase for its backend services, including authentication and a real-time database, to create a seamless and responsive user experience.
+Better You is a dynamic, client-side web application designed to help you build lasting habits, balance your mind, and achieve your personal wellness goals. It provides users with a comprehensive, single-page platform to organize their self-improvement journey. From creating highly detailed, customizable habits and visualizing progress on a streak calendar to receiving motivational boosts and analyzing personal insights, Better You aims to make wellness planning structured, enjoyable, and elegant. This project leverages the power of Firebase for its backend services, including authentication and a real-time database, to create a seamless and responsive user experience.
 
 ## Project Type
 Frontend | Serverless Backend (Firebase)
