@@ -14,6 +14,8 @@ interface AddHabitModalProps {
 }
 const colorOptions = ['blue', 'green', 'red', 'yellow', 'purple', 'pink', 'teal'];
 const iconOptions = { FiZap, FiBookOpen, FiCoffee, FiDroplet, FiMoon, FiSun };
+// Helper function to get today's date in YYYY-MM-DD format
+const getTodayString = () => new Date().toISOString().split('T')[0];
 
 export function AddHabitModal({ isOpen, onClose, habitToEdit }: AddHabitModalProps) {
     // All the state and handler functions remain exactly the same.
@@ -27,6 +29,9 @@ export function AddHabitModal({ isOpen, onClose, habitToEdit }: AddHabitModalPro
     const [goalUnit, setGoalUnit] = useState('times');
     const [repeatFrequency, setRepeatFrequency] = useState<'daily' | 'weekly'>('daily');
     const [subtasks, setSubtasks] = useState<{ [id: string]: { text: string; completed: boolean } }>({});
+    const [startDate, setStartDate] = useState(getTodayString());
+    const [endDate, setEndDate] = useState(''); // Empty string means no end date
+
     const [newSubtaskText, setNewSubtaskText] = useState('');
     const isEditMode = habitToEdit !== null;
     useEffect(() => {
@@ -39,6 +44,8 @@ export function AddHabitModal({ isOpen, onClose, habitToEdit }: AddHabitModalPro
             setGoalUnit(habitToEdit.goal?.unit || 'times');
             setRepeatFrequency(habitToEdit.repeat?.frequency || 'daily');
             setSubtasks(habitToEdit.subtasks || {});
+            setStartDate(habitToEdit.startDate || getTodayString());
+            setEndDate(habitToEdit.endDate || '');
         }
     }, [habitToEdit, isOpen, isEditMode]);
     const handleAddSubtask = () => {
@@ -65,6 +72,8 @@ export function AddHabitModal({ isOpen, onClose, habitToEdit }: AddHabitModalPro
         setRepeatFrequency('daily');
         setSubtasks({});
         setNewSubtaskText('');
+        setStartDate(getTodayString());
+        setEndDate('');
         onClose();
     };
     const handleSave = async () => {
@@ -81,6 +90,8 @@ export function AddHabitModal({ isOpen, onClose, habitToEdit }: AddHabitModalPro
             goal: { type: goalType, target: goalTarget, unit: goalUnit },
             repeat: { frequency: repeatFrequency },
             subtasks,
+            startDate,
+            endDate: endDate || undefined,
         };
         if (isEditMode) {
             await updateHabit(user.uid, habitToEdit.id, habitData);
@@ -150,6 +161,35 @@ export function AddHabitModal({ isOpen, onClose, habitToEdit }: AddHabitModalPro
                         <div className={styles.segmentedControl}>
                             <button onClick={() => setRepeatFrequency('daily')} className={`${styles.segmentedControlButton} ${repeatFrequency === 'daily' ? styles.segmentedControlButtonSelected : ''}`}>Daily</button>
                             <button onClick={() => setRepeatFrequency('weekly')} className={`${styles.segmentedControlButton} ${repeatFrequency === 'weekly' ? styles.segmentedControlButtonSelected : ''}`}>Weekly</button>
+                        </div>
+                    </div>
+
+                    {/* --- DATE PICKER SECTION --- */}
+                    <div>
+                        <label className={styles.formSectionTitle}>Schedule</label>
+                        <div className={styles.dateInputContainer}>
+                            {/* Start Date */}
+                            <div className="flex-1">
+                                <label className="form-label">Start Date</label>
+                                <input
+                                    type="date"
+                                    className="form-input"
+                                    value={startDate}
+                                    onChange={(e) => setStartDate(e.target.value)}
+                                />
+                            </div>
+                            {/* End Date */}
+                            <div className="flex-1">
+                                <label className="form-label">End Date (Optional)</label>
+                                <input
+                                    type="date"
+                                    className="form-input"
+                                    value={endDate}
+                                    onChange={(e) => setEndDate(e.target.value)}
+                                    // The start date must be selected before an end date can be
+                                    min={startDate}
+                                />
+                            </div>
                         </div>
                     </div>
 

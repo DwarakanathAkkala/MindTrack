@@ -16,6 +16,8 @@ export interface Habit {
         days?: { [key: string]: boolean }; // e.g., { Mon: true, Wed: true }
     };
     subtasks: { [id: string]: { text: string; completed: boolean } };
+    startDate: string; // Stored as "YYYY-MM-DD"
+    endDate?: string;  // Optional, stored as "YYYY-MM-DD"
 }
 
 /**
