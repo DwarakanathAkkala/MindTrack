@@ -44,8 +44,8 @@ export function MainLayout({ children, onNewHabitClick, sidebarContent }: MainLa
         <div className="bg-gray-100 min-h-screen">
             <header className="bg-white shadow-sm p-4 flex justify-between items-center">
                 <Link to="/dashboard" className="flex items-center gap-3">
-                    <img src={logoSrc} alt="MindTrack Logo" className="h-10 w-10" />
-                    <span className="text-xl font-bold text-gray-800 hidden sm:block">MindTrack</span>
+                    <img src={logoSrc} alt="Better You Logo" className="h-10 w-10" />
+                    <span className="text-xl font-bold text-gray-800 hidden sm:block">Better You</span>
                 </Link>
                 <div className="flex items-center space-x-4">
                     <button className="btn-primary-header" onClick={onNewHabitClick}>
