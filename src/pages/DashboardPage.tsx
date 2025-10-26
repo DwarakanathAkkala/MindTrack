@@ -1,12 +1,13 @@
-import { useEffect, useState } from 'react';
+import { useEffect, useState, useMemo } from 'react';
 import { useSelector, useDispatch } from 'react-redux';
-import { FiMoreVertical, FiEdit, FiTrash2, FiZap, FiBookOpen, FiCoffee, FiDroplet, FiMoon, FiSun } from 'react-icons/fi';
+import { FiChevronRight, FiChevronLeft, FiMoreVertical, FiEdit, FiTrash2, FiZap, FiBookOpen, FiCoffee, FiDroplet, FiMoon, FiSun } from 'react-icons/fi';
 import type { RootState, AppDispatch } from '../store/store';
 import type { DialogOptions } from '../components/ui/useConfirmationDialog';
 import { getHabits, listenToHabitLogs, deleteHabit, logHabitCompletion } from '../features/habits/services';
 import { setHabits, setHabitsStatus } from '../features/habits/habitsSlice';
 import { setLogs } from '../features/habits/logsSlice';
 import { MotivationalMessage } from '../components/ui/MotivationalMessage';
+import { useCalendar } from '../hooks/useCalendar';
 
 const iconMap = { FiZap, FiBookOpen, FiCoffee, FiDroplet, FiMoon, FiSun };
 
@@ -125,10 +126,19 @@ function HabitItem({ habit, isCompleted, onToggleComplete, onEdit, onDelete }: {
     );
 }
 
-// NOTE THE 'export' KEYWORD HERE
 export function Calendar() {
     const habits = useSelector((state: RootState) => state.habits.habits);
     const logs = useSelector((state: RootState) => state.logs.logs);
+
+    const {
+        currentMonth,
+        currentYear,
+        calendarDays,
+        monthName,
+        goToNextMonth,
+        goToPreviousMonth
+    } = useCalendar();
+
     const calculateCurrentStreak = () => {
         if (!logs || habits.length === 0) return 0;
         let streak = 0;
@@ -137,50 +147,80 @@ export function Calendar() {
             const dateToCheck = new Date(today);
             dateToCheck.setDate(today.getDate() - i);
             const dateStr = dateToCheck.toISOString().split('T')[0];
-            const allHabitsForDay = habits;
+
+            const allHabitsForDay = habits.filter(h => new Date(h.startDate) <= dateToCheck && (!h.endDate || new Date(h.endDate) >= dateToCheck));
+
             if (allHabitsForDay.length === 0) {
-                if (i === 0) return 0;
-                break;
+                if (i === 0) return 0; // No habits scheduled for today
+                break; // Streak ends if there were no habits scheduled for a past day
             }
-            const completedCount = allHabitsForDay.reduce((count, habit) => (logs[habit.id]?.[dateStr]?.completed ? count + 1 : count), 0);
+
+            const completedCount = allHabitsForDay.reduce((count, habit) => {
+                if (logs[habit.id]?.[dateStr]?.completed) {
+                    return count + 1;
+                }
+                return count; // <-- THIS RETURN WAS MISSING
+            }, 0);
+
             if (completedCount === allHabitsForDay.length) {
                 streak++;
             } else {
-                if (i === 0) return 0;
-                break;
+                if (i === 0) return 0; // Today is not fully complete
+                break; // Streak is broken
             }
         }
         return streak;
     };
+
     const currentStreak = calculateCurrentStreak();
-    const todayDate = new Date();
-    const currentMonth = todayDate.getMonth();
-    const currentYear = todayDate.getFullYear();
-    const firstDayOfMonth = new Date(currentYear, currentMonth, 1).getDay();
-    const daysInMonth = new Date(currentYear, currentMonth + 1, 0).getDate();
-    const calendarDays = Array.from({ length: firstDayOfMonth + daysInMonth }, (_, i) => {
-        if (i < firstDayOfMonth) return null;
-        return i - firstDayOfMonth + 1;
-    });
-    const dailyStatuses: { [key: number]: 'none' | 'partial' | 'complete' } = {};
-    const allHabitsForMonth = habits;
-    if (allHabitsForMonth.length > 0) {
-        for (let day = 1; day <= daysInMonth; day++) {
+
+    const dailyStatuses = useMemo(() => {
+        const statuses: { [key: number]: 'none' | 'partial' | 'complete' } = {};
+        if (!habits || habits.length === 0) return statuses;
+
+        for (const day of calendarDays) {
+            if (!day) continue;
             const dateStr = `${currentYear}-${String(currentMonth + 1).padStart(2, '0')}-${String(day).padStart(2, '0')}`;
-            const completedCount = allHabitsForMonth.reduce((count, habit) => (logs?.[habit.id]?.[dateStr]?.completed ? count + 1 : count), 0);
-            if (completedCount === 0) dailyStatuses[day] = 'none';
-            else if (completedCount < allHabitsForMonth.length) dailyStatuses[day] = 'partial';
-            else dailyStatuses[day] = 'complete';
+
+            const habitsForDay = habits.filter(h => new Date(h.startDate) <= new Date(dateStr) && (!h.endDate || new Date(h.endDate) >= new Date(dateStr)));
+            if (habitsForDay.length === 0) {
+                statuses[day] = 'none';
+                continue;
+            }
+
+            const completedCount = habitsForDay.reduce((count, habit) => (logs?.[habit.id]?.[dateStr]?.completed ? count + 1 : count), 0);
+
+            if (completedCount === 0) statuses[day] = 'none';
+            else if (completedCount < habitsForDay.length) statuses[day] = 'partial';
+            else statuses[day] = 'complete';
         }
-    }
+        return statuses;
+    }, [habits, logs, calendarDays, currentMonth, currentYear]);
+
     const daysOfWeek = ['S', 'M', 'T', 'W', 'T', 'F', 'S'];
+
     return (
         <div>
             <div className="calendar-header">
-                <h2 className="widget-title">Streak Calendar</h2>
-                {currentStreak > 0 && (<div className="streak-counter"><span className="streak-fire-emoji">🔥</span><span>{currentStreak} Day{currentStreak > 1 ? 's' : ''}</span></div>)}
+                <h2 className="widget-title">{`${monthName} ${currentYear}`}</h2>
+                <div className="flex items-center gap-4">
+                    {currentStreak > 0 && (
+                        <div className="streak-counter">
+                            <span className="streak-fire-emoji">🔥</span>
+                            <span>{currentStreak} Day{currentStreak > 1 ? 's' : ''}</span>
+                        </div>
+                    )}
+                    <div className="flex items-center">
+                        <button onClick={goToPreviousMonth} className="p-1 rounded-full hover:bg-gray-100">
+                            <FiChevronLeft size={20} />
+                        </button>
+                        <button onClick={goToNextMonth} className="p-1 rounded-full hover:bg-gray-100">
+                            <FiChevronRight size={20} />
+                        </button>
+                    </div>
+                </div>
             </div>
-            <div className="calendar-grid">
+            <div className="calendar-grid mt-4">
                 {daysOfWeek.map((day, index) => <div key={`${day}-${index}`} className="calendar-day-header">{day}</div>)}
                 {calendarDays.map((day, index) => {
                     if (!day) return <div key={`empty-${index}`}></div>;
@@ -192,7 +232,11 @@ export function Calendar() {
                     let streakClasses = '';
                     if (connectLeft) streakClasses += ' streak-connect-left';
                     if (connectRight) streakClasses += ' streak-connect-right';
-                    return (<div key={day} className={`calendar-day-container ${streakClasses}`}><div className={`calendar-day-circle status-${status}`}>{day}</div></div>);
+                    return (
+                        <div key={day} className={`calendar-day-container ${streakClasses}`}>
+                            <div className={`calendar-day-circle status-${status}`}>{day}</div>
+                        </div>
+                    );
                 })}
             </div>
         </div>

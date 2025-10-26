@@ -1,13 +1,15 @@
+import { useState, useEffect, useRef } from 'react';
 import type { ReactNode } from 'react';
 import { useSelector, useDispatch } from 'react-redux';
 import { NavLink } from 'react-router-dom';
-import { FiPlus, FiLogOut, FiHome, FiBarChart2 } from 'react-icons/fi';
+import { FiPlus, FiLogOut, FiHome, FiBarChart2, FiUser } from 'react-icons/fi';
 import type { RootState, AppDispatch } from '../../store/store';
 import { signOutUser } from '../../features/auth/services';
 import { clearUser } from '../../features/auth/authSlice';
 import { Calendar } from '../../pages/DashboardPage';
-import { useReminder } from '../../hooks/useReminder'; // Import the hook
-import { ReminderManager } from '../ui/ReminderManager'; // Import the new component
+import { useReminder } from '../../hooks/useReminder';
+import { ReminderManager } from '../ui/ReminderManager';
+import logoSrc from '../../assets/logoIcon.webp';
 
 interface MainLayoutProps {
     children: ReactNode;
@@ -18,32 +20,76 @@ export function MainLayout({ children, onNewHabitClick }: MainLayoutProps) {
     const user = useSelector((state: RootState) => state.auth.user);
     const dispatch = useDispatch<AppDispatch>();
 
-    // Activate the reminder hook so it runs in the background
+    const [isProfileMenuOpen, setIsProfileMenuOpen] = useState(false);
+    const menuRef = useRef<HTMLDivElement>(null);
+
     useReminder();
 
+    // This effect handles closing the menu when clicking outside of it
+    useEffect(() => {
+        const handleClickOutside = (event: MouseEvent) => {
+            if (menuRef.current && !menuRef.current.contains(event.target as Node)) {
+                setIsProfileMenuOpen(false);
+            }
+        };
+        document.addEventListener('mousedown', handleClickOutside);
+        return () => {
+            document.removeEventListener('mousedown', handleClickOutside);
+        };
+    }, [menuRef]);
+
     const handleSignOut = async () => {
+        setIsProfileMenuOpen(false);
         await signOutUser();
         dispatch(clearUser());
     };
 
     return (
         <div className="bg-gray-100 min-h-screen">
-            <header className="bg-white shadow-sm p-4 flex flex-wrap justify-between items-center gap-4">
-                <h1 className="text-xl sm:text-2xl font-bold text-gray-800 truncate">
-                    Welcome, {user?.displayName || 'User'}!
-                </h1>
-                <div className="flex items-center space-x-2">
+            <header className="bg-white shadow-sm p-4 flex justify-between items-center">
+                {/* Left Side: Logo */}
+                <div className="flex items-center gap-3">
+                    <img src={logoSrc} alt="MindTrack Logo" className="h-10 w-10" />
+                    <span className="text-xl font-bold text-gray-800 hidden sm:block">Better You</span>
+                </div>
+
+                {/* Right Side: Actions & Profile Menu */}
+                <div className="flex items-center space-x-4">
                     <button className="btn-primary-header" onClick={onNewHabitClick}>
-                        <FiPlus className="mr-2" />
+                        <FiPlus className="mr-2 hidden sm:block" />
                         New Habit
                     </button>
-                    <button
-                        className="p-2 text-gray-500 hover:text-indigo-600 transition-colors"
-                        onClick={handleSignOut}
-                        title="Sign Out"
-                    >
-                        <FiLogOut size={22} />
-                    </button>
+
+                    {/* Profile Button and Dropdown */}
+                    <div className="relative" ref={menuRef}>
+                        <button
+                            className="profile-button"
+                            onClick={() => setIsProfileMenuOpen(prev => !prev)}
+                        >
+                            <img
+                                src={user?.photoURL || `https://ui-avatars.com/api/?name=${user?.displayName}&background=random`}
+                                alt="User Profile"
+                                className="profile-avatar"
+                            />
+                        </button>
+
+                        {isProfileMenuOpen && (
+                            <div className="options-menu fade-in-up w-48">
+                                <div className="px-4 py-2 border-b">
+                                    <p className="font-semibold text-sm truncate">{user?.displayName}</p>
+                                    <p className="text-xs text-gray-500 truncate">{user?.email}</p>
+                                </div>
+                                <button className="options-menu-item">
+                                    <FiUser size={16} className="mr-2" />
+                                    Profile
+                                </button>
+                                <button onClick={handleSignOut} className="options-menu-item text-red-500">
+                                    <FiLogOut size={16} className="mr-2" />
+                                    Sign Out
+                                </button>
+                            </div>
+                        )}
+                    </div>
                 </div>
             </header>
 
@@ -51,7 +97,6 @@ export function MainLayout({ children, onNewHabitClick }: MainLayoutProps) {
                 <div className="dashboard-main-content">
                     {children}
                 </div>
-
                 <aside className="dashboard-sidebar lg:col-span-1">
                     <div className="widget-card">
                         <h2 className="widget-title">Navigation</h2>
@@ -64,10 +109,7 @@ export function MainLayout({ children, onNewHabitClick }: MainLayoutProps) {
                             </NavLink>
                         </nav>
                     </div>
-
-                    {/* Add the Reminder Manager to the sidebar */}
                     <ReminderManager />
-
                     <div className="widget-card">
                         <Calendar />
                     </div>
