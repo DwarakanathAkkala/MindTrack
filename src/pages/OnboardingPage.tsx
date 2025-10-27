@@ -1,17 +1,16 @@
 import { useState } from 'react';
 import { useSelector } from 'react-redux';
+import { useNavigate } from 'react-router-dom';
+import { FiZap, FiMoon, FiSun, FiBarChart2, FiCheckCircle } from 'react-icons/fi';
 import type { RootState } from '../store/store';
 import { saveUserProfile } from '../features/user/services';
-import { FiZap, FiMoon, FiSun, FiBarChart2, FiCheckCircle } from 'react-icons/fi';
-import { useNavigate } from 'react-router-dom';
 
 const TOTAL_STEPS = 2;
 
-
 export function OnboardingPage() {
-
-    const navigate = useNavigate(); // Hook to navigate to other pages
+    const navigate = useNavigate();
     const user = useSelector((state: RootState) => state.auth.user);
+
     const [step, setStep] = useState(1);
 
     // State for Step 1
@@ -33,21 +32,18 @@ export function OnboardingPage() {
     const handleFinish = async () => {
         if (!user) {
             console.error("Cannot save profile: No user is logged in.");
-            return; // Exit if for some reason there is no user
+            return;
         }
 
         const profileData = {
-            name: name,
-            focusAreas: focusAreas,
-            sleepHours: sleepHours,
-            priority: priority,
-            onboardingCompleted: true, // This flag is important for later
+            name: name || user.displayName || 'User',
+            focusAreas,
+            sleepHours,
+            priority,
+            onboardingCompleted: true,
         };
 
-        // Call our new service function to save the data
         await saveUserProfile(user.uid, profileData);
-
-        // Redirect the user to their dashboard after completion
         navigate('/dashboard');
     };
 
@@ -56,21 +52,9 @@ export function OnboardingPage() {
             case 1:
                 return (
                     <div className="fade-in-up">
-                        <label htmlFor="name" className="form-label">
-                            What should we call you?
-                        </label>
-                        <input
-                            id="name"
-                            type="text"
-                            className="form-input"
-                            placeholder="Enter your name..."
-                            value={name}
-                            onChange={(e) => setName(e.target.value)}
-                        />
-
-                        <label className="form-label mt-6">
-                            Select your primary focus areas:
-                        </label>
+                        <label htmlFor="name" className="form-label">What should we call you?</label>
+                        <input id="name" type="text" className="form-input" placeholder="Enter your name..." value={name} onChange={(e) => setName(e.target.value)} />
+                        <label className="form-label mt-6">Select your primary focus areas:</label>
                         <div className="focus-card-grid">
                             <FocusCard isSelected={focusAreas.includes('Fitness')} onClick={() => handleFocusAreaToggle('Fitness')} icon={<FiZap size={24} />} label="Fitness" />
                             <FocusCard isSelected={focusAreas.includes('Sleep')} onClick={() => handleFocusAreaToggle('Sleep')} icon={<FiMoon size={24} />} label="Sleep" />
@@ -112,48 +96,32 @@ export function OnboardingPage() {
                     {step === 1 ? 'Let’s Get to Know You' : 'Tell Us About Your Routine'}
                 </h1>
                 <div className="progress-bar-background">
-                    <div
-                        className="progress-bar-fill"
-                        style={{ width: `${progressPercentage}%` }}
-                    />
+                    <div className="progress-bar-fill" style={{ width: `${progressPercentage}%` }} />
                 </div>
 
                 {renderStep()}
 
                 <div className="mt-8 flex items-center justify-between">
-                    {/* Back Button: Only shows on steps after the first one */}
                     <div>
                         {step > 1 && (
-                            <button
-                                className="btn-secondary" // Using our existing secondary button style
-                                onClick={() => setStep((s) => s - 1)}
-                            >
+                            <button className="btn-secondary" onClick={() => setStep((s) => s - 1)}>
                                 Back
                             </button>
                         )}
                     </div>
-
-                    {/* Next / Finish Button */}
                     <div>
                         {step < TOTAL_STEPS ? (
-                            <button
-                                className="btn-primary"
-                                onClick={() => setStep((s) => s + 1)}
-                            >
+                            <button className="btn-primary" onClick={() => setStep((s) => s + 1)}>
                                 Next
                             </button>
                         ) : (
-                            <button
-                                className="btn-primary flex items-center"
-                                onClick={handleFinish}
-                            >
+                            <button className="btn-primary flex items-center" onClick={handleFinish}>
                                 <FiCheckCircle className="mr-2" />
                                 Finish & Go to Dashboard
                             </button>
                         )}
                     </div>
                 </div>
-
             </div>
         </div>
     );
