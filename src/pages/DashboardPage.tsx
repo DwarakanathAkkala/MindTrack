@@ -118,7 +118,7 @@ export function DashboardSidebar() {
         for (let i = 0; i < 365; i++) {
             const dateToCheck = new Date(today);
             dateToCheck.setDate(today.getDate() - i);
-            const dateStr = dateToCheck.toISOString().split('T')[0];
+            const dateStr = getTodayString(dateToCheck);
             const habitsForDay = habits.filter(h => h.startDate <= dateStr && (!h.endDate || h.endDate >= dateStr));
             if (habitsForDay.length === 0) {
                 if (i === 0) return 0;
