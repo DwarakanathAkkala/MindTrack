@@ -21,45 +21,46 @@ export interface Habit {
     reminderTime?: string;
 }
 
+// createHabit, getHabits, updateHabit, deleteHabit are unchanged
 export const createHabit = async (userId: string, habitData: Omit<Habit, 'id'>) => {
     try {
         const habitsRef = ref(db, `habits/${userId}`);
         const newHabitRef = push(habitsRef);
-        await set(newHabitRef, {
-            ...habitData,
-            createdAt: new Date().toISOString(),
-        });
-        console.log("✅ New habit created successfully!");
-    } catch (error) {
-        console.error("❌ Error creating new habit:", error);
-    }
+        await set(newHabitRef, { ...habitData, createdAt: new Date().toISOString() });
+    } catch (error) { console.error("Error creating habit:", error); }
 };
-
 export const getHabits = (userId: string, callback: (habits: (Habit & { id: string })[]) => void) => {
     const habitsRef = ref(db, `habits/${userId}`);
     const unsubscribe = onValue(habitsRef, (snapshot) => {
         if (snapshot.exists()) {
-            const habitsData = snapshot.val();
-            const habitsArray = Object.keys(habitsData).map(key => ({
-                id: key,
-                ...habitsData[key],
-            }));
-            callback(habitsArray);
-        } else {
-            callback([]);
-        }
+            const data = snapshot.val();
+            const array = Object.keys(data).map(key => ({ id: key, ...data[key] }));
+            callback(array);
+        } else { callback([]); }
     });
     return unsubscribe;
 };
+export const updateHabit = async (userId: string, habitId: string, updates: Partial<Habit>) => {
+    try {
+        const habitRef = ref(db, `habits/${userId}/${habitId}`);
+        await update(habitRef, updates);
+    } catch (error) { console.error("Error updating habit:", error); }
+};
+export const deleteHabit = async (userId: string, habitId: string) => {
+    try {
+        const habitRef = ref(db, `habits/${userId}/${habitId}`);
+        await remove(habitRef);
+        const logRef = ref(db, `habitLogs/${userId}/${habitId}`);
+        await remove(logRef);
+    } catch (error) { console.error("Error deleting habit:", error); }
+};
 
+
+// BRINGING BACK THE REAL-TIME LISTENER
 export const listenToHabitLogs = (userId: string, callback: (logs: any) => void) => {
     const logsRef = ref(db, `habitLogs/${userId}`);
     const unsubscribe = onValue(logsRef, (snapshot) => {
-        if (snapshot.exists()) {
-            callback(snapshot.val());
-        } else {
-            callback(null);
-        }
+        callback(snapshot.exists() ? snapshot.val() : null);
     });
     return unsubscribe;
 };
@@ -68,30 +69,8 @@ export const logHabitCompletion = async (userId: string, habitId: string, date: 
     try {
         const logRef = ref(db, `habitLogs/${userId}/${habitId}/${date}`);
         await set(logRef, { completed });
-        console.log(`✅ Habit log updated for ${date}`);
     } catch (error) {
         console.error("❌ Error logging habit completion:", error);
-    }
-};
-
-export const updateHabit = async (userId: string, habitId: string, updates: Partial<Habit>) => {
-    try {
-        const habitRef = ref(db, `habits/${userId}/${habitId}`);
-        await update(habitRef, updates);
-        console.log("✅ Habit updated successfully!");
-    } catch (error) {
-        console.error("❌ Error updating habit:", error);
-    }
-};
-
-export const deleteHabit = async (userId: string, habitId: string) => {
-    try {
-        const habitRef = ref(db, `habits/${userId}/${habitId}`);
-        await remove(habitRef);
-        const logRef = ref(db, `habitLogs/${userId}/${habitId}`);
-        await remove(logRef);
-        console.log("✅ Habit and logs deleted successfully!");
-    } catch (error) {
-        console.error("❌ Error deleting habit:", error);
+        throw error;
     }
 };
