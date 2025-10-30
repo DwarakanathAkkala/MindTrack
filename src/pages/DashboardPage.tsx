@@ -9,6 +9,7 @@ import { setHabits, setHabitsStatus } from '../features/habits/habitsSlice';
 import { setLogs } from '../features/habits/logsSlice';
 import { MotivationalMessage } from '../components/ui/MotivationalMessage';
 import { Achievements } from '../components/ui/Achievements';
+import { checkAndAwardAchievement } from '../features/user/services';
 
 const iconMap = { FiZap, FiBookOpen, FiCoffee, FiDroplet, FiMoon, FiSun };
 
@@ -131,8 +132,13 @@ export function DashboardSidebar() {
                 break;
             }
         }
+
+        if (user && streak > 0) {
+            checkAndAwardAchievement(user.uid, streak);
+        }
+
         return streak;
-    }, [logs, habits]);
+    }, [logs, habits, user]);
 
     return (
         <div className="space-y-6">

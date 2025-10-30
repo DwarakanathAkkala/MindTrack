@@ -52,3 +52,38 @@ export const getUserProfile = async (userId: string) => { // 2. Add the new func
         return null;
     }
 };
+
+// Checks the streak and updates the profile
+export const checkAndAwardAchievement = async (userId: string, currentStreak: number) => {
+    if (!userId) return;
+
+    const achievementTiers = [
+        { id: 'streak_3_day', days: 3 },
+        { id: 'streak_7_day', days: 7 },
+        { id: 'streak_30_day', days: 30 },
+    ];
+
+    try {
+        const profileRef = ref(db, `userProfiles/${userId}`);
+        const snapshot = await get(profileRef);
+        const profile = snapshot.val() || {};
+
+        const achieved: { [key: string]: string } = profile.achievements || {};
+        let updatesMade = false;
+
+        for (const tier of achievementTiers) {
+            // If the achievement has not been recorded AND the user has reached the required streak
+            if (!achieved[tier.id] && currentStreak >= tier.days) {
+                achieved[tier.id] = new Date().toISOString().split('T')[0]; // Save the date achieved
+                updatesMade = true;
+            }
+        }
+
+        if (updatesMade) {
+            await update(profileRef, { achievements: achieved });
+            console.log("✅ New achievements awarded and saved.");
+        }
+    } catch (error) {
+        console.error("❌ Error checking and awarding achievements:", error);
+    }
+};
