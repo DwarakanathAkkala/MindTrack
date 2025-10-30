@@ -17,6 +17,14 @@ interface DashboardPageProps {
     confirm: (options: DialogOptions) => Promise<boolean>;
 }
 
+// Helper Function: Gets YYYY-MM-DD string based on LOCAL time
+const getTodayString = (date: Date = new Date()): string => {
+    const year = date.getFullYear();
+    const month = String(date.getMonth() + 1).padStart(2, '0');
+    const day = String(date.getDate()).padStart(2, '0');
+    return `${year}-${month}-${day}`;
+};
+
 // --- Main Page Component (Left Column) ---
 export function DashboardPage({ setModalState, confirm }: DashboardPageProps) {
     const dispatch = useDispatch<AppDispatch>();
@@ -25,7 +33,7 @@ export function DashboardPage({ setModalState, confirm }: DashboardPageProps) {
     const habitsStatus = useSelector((state: RootState) => state.habits.status);
     const logs = useSelector((state: RootState) => state.logs.logs);
 
-    const today = new Date().toISOString().split('T')[0];
+    const today = getTodayString();
 
     const [updatingHabits, setUpdatingHabits] = useState<Set<string>>(new Set());
 
@@ -52,6 +60,7 @@ export function DashboardPage({ setModalState, confirm }: DashboardPageProps) {
         const newStatus = !currentStatus;
 
         try {
+            // Use the correct 'today' variable here
             await logHabitCompletion(user.uid, habitId, today, newStatus);
         } catch (error) {
             console.error("Failed to save habit completion:", error);

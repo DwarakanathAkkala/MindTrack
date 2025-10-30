@@ -13,14 +13,20 @@ interface AddHabitModalProps {
     habitToEdit: (Habit & { id: string }) | null;
 }
 
+// Helper Function: Gets YYYY-MM-DD string based on LOCAL time
+const getTodayString = (date: Date = new Date()): string => {
+    const year = date.getFullYear();
+    const month = String(date.getMonth() + 1).padStart(2, '0');
+    const day = String(date.getDate()).padStart(2, '0');
+    return `${year}-${month}-${day}`;
+};
+
 const colorOptions = ['blue', 'green', 'red', 'yellow', 'purple', 'pink', 'teal'];
 const iconOptions = { FiZap, FiBookOpen, FiCoffee, FiDroplet, FiMoon, FiSun };
 
 export function AddHabitModal({ isOpen, onClose, habitToEdit }: AddHabitModalProps) {
     const { showToast } = useToast();
     const user = useSelector((state: RootState) => state.auth.user);
-
-    const getTodayString = () => new Date().toISOString().split('T')[0];
 
     const [title, setTitle] = useState('');
     const [category, setCategory] = useState('');
