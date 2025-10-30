@@ -53,8 +53,21 @@ export function MainLayout({ children, onNewHabitClick, sidebarContent }: MainLa
                         New Habit
                     </button>
                     <div className="relative" ref={menuRef}>
-                        <button className="profile-button" onClick={() => setIsProfileMenuOpen(prev => !prev)}>
-                            <img src={user?.photoURL || `https://ui-avatars.com/api/?name=${user?.displayName}&background=random`} alt="User Profile" className="profile-avatar" />
+                        <button
+                            className="profile-button flex items-center justify-center bg-gray-200"
+                            onClick={() => setIsProfileMenuOpen(prev => !prev)}
+                        >
+                            {/* The FIX: Check if the photoURL is a string AND if it starts with 'http' (a full URL) */}
+                            {user?.photoURL && user.photoURL.startsWith('http') ? (
+                                <img
+                                    src={user.photoURL}
+                                    alt="User Profile"
+                                    className="profile-avatar"
+                                />
+                            ) : (
+                                // FALLBACK ICON
+                                <FiUser size={24} className="text-gray-600" />
+                            )}
                         </button>
                         {isProfileMenuOpen && (
                             <div className="options-menu fade-in-up w-48">
