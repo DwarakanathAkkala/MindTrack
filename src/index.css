@@ -182,6 +182,13 @@ body {
   @apply bg-green-500 text-white font-bold;
 }
 
+.is-today {
+  /* Base Style: Light Indigo background for visibility */
+  @apply bg-indigo-50 text-indigo-700 font-semibold;
+  /* Outer Ring: The strong, prominent outline */
+  @apply ring-2 ring-offset-2 ring-indigo-500;
+}
+
 .streak-connect-left::before,
 .streak-connect-right::after {
   content: '';

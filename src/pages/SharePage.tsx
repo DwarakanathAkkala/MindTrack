@@ -19,36 +19,33 @@ export function SharePage() {
     useEffect(() => {
         if (!userId) return;
 
-        const fetchAllData = async () => {
-            const profile = await getUserProfile(userId);
+        getUserProfile(userId).then(profile => {
             setUserProfile(profile);
+        });
 
-            const habitsUnsubscribe = getHabits(userId, (fetchedHabits) => {
-                setHabits(fetchedHabits);
-            });
+        const habitsUnsubscribe = getHabits(userId, (fetchedHabits) => {
+            setHabits(fetchedHabits);
+        });
 
-            const logsUnsubscribe = listenToHabitLogs(userId, (fetchedLogs) => {
-                setLogs(fetchedLogs);
-            });
+        const logsUnsubscribe = listenToHabitLogs(userId, (fetchedLogs) => {
+            setLogs(fetchedLogs);
+        });
 
-            return () => {
-                habitsUnsubscribe();
-                logsUnsubscribe();
-            };
+        return () => {
+            habitsUnsubscribe();
+            logsUnsubscribe();
         };
-
-        fetchAllData();
     }, [userId]);
 
     const currentStreak = useMemo(() => {
-        if (!logs || habits.length === 0) return 0;
+        if (!logs || !habits || habits.length === 0) return 0;
         let streak = 0;
         const today = new Date();
         for (let i = 0; i < 365; i++) {
             const dateToCheck = new Date(today);
             dateToCheck.setDate(today.getDate() - i);
             const dateStr = dateToCheck.toISOString().split('T')[0];
-            const allHabitsForDay = habits.filter(h => new Date(h.startDate) <= dateToCheck && (!h.endDate || new Date(h.endDate) >= dateToCheck));
+            const allHabitsForDay = habits.filter(h => h.startDate <= dateStr && (!h.endDate || h.endDate >= dateStr));
             if (allHabitsForDay.length === 0) {
                 if (i === 0) return 0;
                 break;
@@ -77,7 +74,7 @@ export function SharePage() {
                     className={styles.avatar}
                 />
                 <h1 className={styles.userName}>{userProfile.name}</h1>
-                <p className={styles.shareMessage}>Check my progress on Better You!</p>
+                <p className={styles.shareMessage}>is sharing their progress on MindTrack!</p>
 
                 <div className={styles.streakDisplay}>
                     <div className={styles.streakNumber}>{currentStreak}</div>
@@ -85,13 +82,11 @@ export function SharePage() {
                 </div>
 
                 <div className="mt-8">
-                    {/* We must pass the userId to Achievements on this page */}
                     {userId && <Achievements streak={currentStreak} userId={userId} />}
                 </div>
 
-                {/* Convert to Action Link */}
                 <Link to="/" className={styles.ctaLink}>
-                    Unleash the Better in You through Better You!
+                    You too can achieve this. Let's go!
                 </Link>
             </div>
         </div>
