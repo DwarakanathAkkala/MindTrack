@@ -41,6 +41,7 @@ export function OnboardingPage() {
             sleepHours,
             priority,
             onboardingCompleted: true,
+            photoURL: user.photoURL || undefined
         };
 
         await saveUserProfile(user.uid, profileData);
