@@ -115,20 +115,34 @@ export function DashboardSidebar() {
         if (!logs || !habits || habits.length === 0) return 0;
         let streak = 0;
         const today = new Date();
-        for (let i = 0; i < 365; i++) {
+        const todayStr = getTodayString(today);
+
+        // 1. Check if TODAY is fully complete. If not, we count the streak ending YESTERDAY.
+        const habitsScheduledToday = habits.filter(h => h.startDate <= todayStr && (!h.endDate || h.endDate >= todayStr));
+        const completedToday = habitsScheduledToday.reduce((count, habit) => (logs[habit.id]?.[todayStr]?.completed ? count + 1 : count), 0);
+
+        let isTodayComplete = completedToday === habitsScheduledToday.length;
+
+        // 2. Start checking from today (if complete) or yesterday (if partial/none)
+        let startIndex = isTodayComplete ? 0 : 1;
+
+        for (let i = startIndex; i < 365; i++) {
             const dateToCheck = new Date(today);
             dateToCheck.setDate(today.getDate() - i);
-            const dateStr = dateToCheck.toISOString().split('T')[0];
+            const dateStr = getTodayString(dateToCheck);
+
             const habitsForDay = habits.filter(h => h.startDate <= dateStr && (!h.endDate || h.endDate >= dateStr));
+
             if (habitsForDay.length === 0) {
-                if (i === 0) return 0;
+                // If today was skipped, break. If a past day was skipped, break.
                 break;
             }
+
             const completedCount = habitsForDay.reduce((count, habit) => (logs[habit.id]?.[dateStr]?.completed ? count + 1 : count), 0);
+
             if (completedCount === habitsForDay.length) {
                 streak++;
             } else {
-                if (i === 0) return 0;
                 break;
             }
         }
@@ -230,15 +244,19 @@ function Calendar({ streak }: { streak: number }) {
                 continue;
             }
 
-            const completedCount = habitsForDay.reduce((count, habit) => (logs?.[habit.id]?.[dateStr]?.completed ? count + 1 : count), 0);
+            const completedCount = habitsForDay.reduce((count, habit) => {
+                if (logs?.[habit.id] && logs[habit.id][dateStr]?.completed) {
+                    return count + 1;
+                }
+                return count;
+            }, 0);
 
-            // --- THE DEFINITIVE LOGIC BLOCK ---
+            // --- The Correct Logic Block ---
             if (completedCount === habitsForDay.length) {
                 statuses[day] = 'complete';
             } else if (completedCount > 0) {
                 statuses[day] = 'partial';
             } else {
-                // This is the 'exists but not done' state
                 statuses[day] = 'none';
             }
         }
@@ -273,17 +291,23 @@ function Calendar({ streak }: { streak: number }) {
                     const status = dailyStatuses[day] || 'none';
                     const isToday = day === todayDay && currentMonth === todayMonth && currentYear === todayYear;
 
-                    // FIX 1: Apply 'is-today' ONLY if it's today AND no completion status has been achieved.
+                    // Apply Blue Outline only if it's today AND the status is 'none' (not yet started)
                     const todayClass = isToday && status === 'none' ? 'is-today' : '';
 
                     const prevDayStatus = dailyStatuses[day - 1];
                     const nextDayStatus = dailyStatuses[day + 1];
-                    const connectLeft = status === 'complete' && prevDayStatus === 'complete';
-                    const connectRight = status === 'complete' && nextDayStatus === 'complete';
+
+                    // CRITICAL FIX: Only connect if the day is complete AND it's NOT a week boundary
+                    const isSunday = index % 7 === 0;
+                    const isSaturday = (index + 1) % 7 === 0;
+
+                    // The logic prevents connectors from spanning the weekly gap (Sat->Sun)
+                    const connectLeft = status === 'complete' && prevDayStatus === 'complete' && !isSunday;
+                    const connectRight = status === 'complete' && nextDayStatus === 'complete' && !isSaturday;
 
                     let streakClasses = '';
-                    if (connectLeft) streakClasses += ' streak-connect-left';
-                    if (connectRight) streakClasses += ' streak-connect-right';
+                    if (connectLeft) streakClasses += ' streak-connector-left';
+                    if (connectRight) streakClasses += ' streak-connector-right';
 
                     return (
                         <div key={day} className={`calendar-day-container ${streakClasses}`}>

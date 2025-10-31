@@ -325,3 +325,24 @@ body {
 .option-button-default {
   @apply bg-white border-gray-300 text-gray-600;
 }
+
+/* Ensure streak connector base styles point to the original green */
+.streak-connector-left::before,
+.streak-connector-right::after {
+  content: '';
+  @apply absolute top-1/2 -translate-y-1/2 h-6 w-1/2 z-0 bg-green-500;
+  /* Point to Green */
+}
+
+.streak-connector-left::before {
+  @apply left-0;
+}
+
+.streak-connector-right::after {
+  @apply right-0;
+}
+
+/* Update existing status-complete to the original green */
+.status-complete {
+  @apply bg-green-500 text-white font-bold;
+}
