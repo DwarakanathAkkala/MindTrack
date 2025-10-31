@@ -13,6 +13,7 @@ export interface UserProfile {
     weight?: number;
     birthDate?: string; // YYYY-MM-DD
     primaryGoal?: string;
+    photoURL?: string;
 }
 
 /**
